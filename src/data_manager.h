@@ -27,7 +27,7 @@
 #include "config.h"
 
 #include "simpleregex.h"
-#include "XML_reader.h"
+#include "xml_reader.h"
 #include "utf_converter.h"
 #include "stdbool.h"
 #include "fomalib.h"

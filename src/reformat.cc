@@ -26,7 +26,7 @@
 
 #include <string.h>
 
-#include <XML_reader.h>
+#include <xml_reader.h>
 #include <lttoolbox/xml_parse_util.h>
 
 #include "matxin_string_utils.h"

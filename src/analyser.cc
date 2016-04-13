@@ -27,7 +27,7 @@ using namespace std;
 
 #include "config.h"
 #include "freeling.h"
-#include "IORedirectHandler.hpp"
+#include "io_redirect_handler.h"
 
 
 void PrintDepTree(dep_tree::iterator n, int depth, const config &cfg)

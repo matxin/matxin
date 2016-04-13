@@ -22,9 +22,9 @@
 
 #include "config.h"
 #include "matxin_string_utils.h"
-#include "IORedirectHandler.hpp"
+#include "io_redirect_handler.h"
 
-#include <XML_reader.h>
+#include <xml_reader.h>
 #include <data_manager.h>
 
 using namespace std;

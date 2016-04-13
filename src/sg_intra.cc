@@ -24,9 +24,9 @@
 #include <data_manager.h>
 
 #include "config.h"
-#include "IORedirectHandler.hpp"
+#include "io_redirect_handler.h"
 
-#include <XML_reader.h>
+#include <xml_reader.h>
 
 using namespace std;
 

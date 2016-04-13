@@ -17,7 +17,7 @@
  *  02110-1301  USA
  */
 
-#include <XML_reader.h>
+#include <xml_reader.h>
 
 
 // Converts xmlChar strings used by libxml2 to ordinary strings
