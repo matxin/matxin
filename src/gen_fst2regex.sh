@@ -31,7 +31,7 @@ while (<STDIN>) {
 
 # Jatorrizko fitxategian KORIREKI eta KORITXI ez dira Kark-en parte.
 # Bestealde euskarazko lemetan zuriuneak onartu behar dira.
-    $lerroa = "define Karak [ KORIREKI 0-9a-zA-ZÒ— \"_\" \"-\" KORITXI ] ;" if ( $lerroa =~ /define Karak / );
+    $lerroa = "define Karak [ KORIREKI 0-9a-zA-Z√±√ë \"_\" \"-\" KORITXI ] ;" if ( $lerroa =~ /define Karak / );
 
     $lerroa =~ /define (.*?)( \[.*?\])\s*\;/;
     $ler1 = $1;
