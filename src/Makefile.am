@@ -45,16 +45,16 @@ matxin_deshtml_SOURCES = html-deformat.cc
 matxin_desrtf_SOURCES = rtf-deformat.cc
 
 txt-deformat.cc: txt-format.xml Makefile.am deformat.xsl
-	$(XSlex_transPROC) --stringparam mode matxin deformat.xsl txt-format.xml | $(FLEX) -Cfer -t >$@
+	$(XSLTPROC) --stringparam mode matxin deformat.xsl txt-format.xml | $(FLEX) -Cfer -t >$@
 
 wiki-deformat.cc: wiki-format.xml Makefile.am deformat.xsl
-	$(XSlex_transPROC) --stringparam mode matxin deformat.xsl wiki-format.xml | $(FLEX) -Cfer -t >$@
+	$(XSLTPROC) --stringparam mode matxin deformat.xsl wiki-format.xml | $(FLEX) -Cfer -t >$@
 
 html-deformat.cc: html-format.xml Makefile.am deformat.xsl
-	$(XSlex_transPROC) --stringparam mode matxin deformat.xsl html-format.xml | $(FLEX) -Cfer -t >$@
+	$(XSLTPROC) --stringparam mode matxin deformat.xsl html-format.xml | $(FLEX) -Cfer -t >$@
 
 rtf-deformat.cc: rtf-format.xml Makefile.am deformat.xsl
-	$(XSlex_transPROC) --stringparam mode matxin deformat.xsl rtf-format.xml | $(FLEX) -Cfer -t >$@
+	$(XSLTPROC) --stringparam mode matxin deformat.xsl rtf-format.xml | $(FLEX) -Cfer -t >$@
 
 matxin: Makefile.am gen_matxin_translator.sh
 	@echo "Creating $@ script"
