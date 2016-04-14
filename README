@@ -7,8 +7,10 @@
     a. Requirements:
       - i686, ppc, SPARC, etc.
       - g++ >= 3.x
-      - freeling-svn
+      - freeling ==3.1
       - lttoolbox >= 3.1.0
+      - libfoma0-dev >= 0.9.18~r248
+      - foma-bin >= 0.9.18+r243
       - libxml2 >= 2.6.17
       - libpcre >= 6.4
       - gnu make
