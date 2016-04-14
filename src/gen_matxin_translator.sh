@@ -18,7 +18,7 @@ usage()
   echo "Module options"
   echo "--------------"
   cd $MATXIN_DIR/bin >& /dev/null
-  ./Analyzer --help
+  ./matxin-analyser --help
   exit 1;
 }
 
@@ -63,34 +63,34 @@ cd $MATXIN_DIR/bin >& /dev/null
 # Determine which formatter to use
 case $FORMAT in
 txt)
-  DE_FORMATER="txt-deformat $FORMAT_TMP $INPUT_ABS"
+  DE_FORMATER="matxin-destxt $FORMAT_TMP $INPUT_ABS"
   ;;
 wiki)
-  DE_FORMATER="wiki-deformat $FORMAT_TMP $INPUT_ABS"
+  DE_FORMATER="matxin-deswiki $FORMAT_TMP $INPUT_ABS"
   ;;
 rtf)
-  DE_FORMATER="rtf-deformat $FORMAT_TMP $INPUT_ABS"
+  DE_FORMATER="matxin-desrtf $FORMAT_TMP $INPUT_ABS"
   ;;
 html)
-  DE_FORMATER="html-deformat $FORMAT_TMP $INPUT_ABS"
+  DE_FORMATER="matxin-deshtml $FORMAT_TMP $INPUT_ABS"
   ;;
 *)
-  DE_FORMATER="txt-deformat $FORMAT_TMP $INPUT_ABS"
+  DE_FORMATER="matxin-destxt $FORMAT_TMP $INPUT_ABS"
   ;;
 esac
 
 # The Matxin translation pipe
-./$DE_FORMATER | ./Analyzer $MATXIN_PARAM | ./LT $MATXIN_PARAM | ./ST_intra $MATXIN_PARAM | ./ST_inter --inter 1 $MATXIN_PARAM  | ./ST_prep $MATXIN_PARAM  | ./ST_inter --inter 2 $MATXIN_PARAM  | ./ST_verb $MATXIN_PARAM | ./ST_inter --inter 3 $MATXIN_PARAM  | ./SG_inter $MATXIN_PARAM | ./SG_intra $MATXIN_PARAM | ./SG_move $MATXIN_PARAM | ./MG $MATXIN_PARAM > $XML_TMP
+./$DE_FORMATER | ./matxin-analyser $MATXIN_PARAM | ./matxin-xfer-lex $MATXIN_PARAM | ./matxin-xfer-intra $MATXIN_PARAM | ./matxin-xfer-inter --inter 1 $MATXIN_PARAM  | ./matxin-xfer-adp $MATXIN_PARAM  | ./matxin-xfer-inter --inter 2 $MATXIN_PARAM  | ./matxin-xfer-verb $MATXIN_PARAM | ./matxin-xfer-inter --inter 3 $MATXIN_PARAM  | ./matxin-gen-inter $MATXIN_PARAM | ./matxin-gen-intra $MATXIN_PARAM | ./matxin-gen-move $MATXIN_PARAM | ./matxin-gen-morf $MATXIN_PARAM > $XML_TMP
 
 if [ "x" != "x$OUTPUT" ]; then
-    ./reFormat $FORMAT_TMP $RE_FORMATER_PARAM < $XML_TMP > $OUTPUT_ABS
+    ./matxin-reformat $FORMAT_TMP $RE_FORMATER_PARAM < $XML_TMP > $OUTPUT_ABS
 else
-    ./reFormat $FORMAT_TMP $RE_FORMATER_PARAM < $XML_TMP
+    ./matxin-reformat $FORMAT_TMP $RE_FORMATER_PARAM < $XML_TMP
 fi
 
 if [ "x1" == "x$REMOVE_TMP" ]; then
     rm $FORMAT_TMP >& /dev/null
     rm $XML_TMP >& /dev/null
-fi 
+fi
 rm $WIKI_TMP >& /dev/null
 
