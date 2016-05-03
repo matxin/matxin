@@ -1,10 +1,14 @@
 EXTRA_DIST = config.h data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml
 
+matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
+
+matxindir = $(prefix)/share/matxin
+
 bin_PROGRAMS = matxin-analyser matxin-xfer-lex matxin-xfer-intra matxin-xfer-inter matxin-xfer-adp \
 	       matxin-xfer-verb matxin-gen-inter matxin-gen-intra matxin-gen-move \
 	       matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki matxin-deshtml matxin-desrtf
 
-bin_SCRIPTS = matxin fst2regex.pl
+bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-validate-modes
 
 matxin_analyser_SOURCES = analyser.cc io_redirect_handler.cc io_redirect_handler.hpp
 matxin_analyser_LDADD = -lfreeling -lboost_system -lboost_program_options
@@ -56,7 +60,16 @@ html-deformat.cc: html-format.xml Makefile.am deformat.xsl
 rtf-deformat.cc: rtf-format.xml Makefile.am deformat.xsl
 	$(XSLTPROC) --stringparam mode matxin deformat.xsl rtf-format.xml | $(FLEX) -Cfer -t >$@
 
-matxin: Makefile.am gen_matxin_translator.sh
+matxin: Makefile.am matxin-header.sh
+	@echo "Creating matxin script"
+	@echo "#!$(BASH)" > $@
+	@echo "MATXIN_PATH=\"$(prefix)/bin\"" >>$@
+	@echo "LTTOOLBOX_PATH=\"$(prefix)/bin\"" >>$@
+	@echo "DEFAULT_DIRECTORY=\"$(prefix)/share/matxin\"" >>$@
+	@cat matxin-header.sh >>$@
+	@chmod a+x $@
+
+matxin-translator: Makefile.am gen_matxin_translator.sh
 	@echo "Creating $@ script"
 	@echo "#!$(BASH)" > $@
 	@echo "MATXIN_DIR=\"$(prefix)\"" >> $@
@@ -68,3 +81,23 @@ fst2regex.pl: Makefile.am gen_fst2regex.sh
 	@echo "#!$(PERL)" > $@
 	@cat gen_fst2regex.sh >> $@
 	@chmod a+x $@
+
+matxin-gen-modes: Makefile.am modes-header.sh
+	@echo "Creating matxin-gen-modes script"
+	@echo "#!$(BASH)" > $@
+	@echo "MATXINDIR="$(matxindir) >> $@
+	@cat modes-header.sh >> $@
+	@echo "$(XMLLINT) --relaxng $(matxindir)/modes.rng --noout \$$FILE1 && \\" >> $@
+	@if [ `basename $(XSLTPROC)` == xsltproc ]; \
+	  then echo "$(XSLTPROC) --stringparam prefix $(prefix)/bin --stringparam dataprefix \$$FULLDIRNAME  $(matxindir)/modes2bash.xsl \$$FILE1 | awk -f $(matxindir)/matxin-createmodes.awk PARAM=\$$FULLDIRNAME"; \
+	  else echo "$(XSLTPROC) $(matxindir)/modes2bash.xsl \$$FILE1 \\\$$prefix=$(prefix)/bin \\\$$dataprefix=\$$FULLDIRNAME| awk -f $(matxindir)/matxin-createmodes.awk PARAM=\$$FULLDIRNAME"; \
+	  fi >> $@
+	@chmod a+x $@
+
+matxin-validate-modes: Makefile.am validate-header.sh
+	@echo "Creating matxin-validate-modes script"
+	@echo "#!$(BASH)" > $@
+	@cat validate-header.sh >> $@
+	@echo "$(XMLLINT) --relaxng $(matxindir)/modes.rng --noout \"\$$FILE1\"" >>$@
+	@chmod a+x $@
+

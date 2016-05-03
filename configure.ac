@@ -161,6 +161,26 @@ AC_ARG_WITH(berkeley,
                  ;;
               esac ])
 
+AC_PATH_PROG(XMLLINT, xmllint, no)
+if test x$ac_cv_path_XMLLINT = x
+then
+  AC_MSG_ERROR([You don't have xmllint installed.])
+fi
+if test x$ac_cv_path_XMLLINT = xno
+then
+  AC_MSG_ERROR([You don't have xmllint installed.])
+fi
+
+  AC_PATH_PROG(XSLTPROC, xsltproc, no)
+  if test x$ac_cv_path_XSLTPROC = x
+  then
+    AC_MSG_ERROR([You don't have xsltproc installed.])
+  fi
+  if test x$ac_cv_path_XSLTPROC = xno
+  then
+    AC_MSG_ERROR([You don't have xsltproc installed.])
+  fi
+
 
 #
 # Checks for programs.

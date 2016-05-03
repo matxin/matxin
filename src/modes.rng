@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+   Copyright (C) 2005 Universitat d'Alacant / Universidad de Alicante
+  
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+  
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+  
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, see <http://www.gnu.org/licenses/>.
+  
+  DTD for the modes.xml file     
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="modes">
+    <element name="modes">
+      <ref name="attlist.modes"/>
+      <oneOrMore>
+        <ref name="mode"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.modes" combine="interleave">
+    <empty/>
+  </define>
+  <define name="mode">
+    <element name="mode">
+      <ref name="attlist.mode"/>
+      <ref name="pipeline"/>
+    </element>
+  </define>
+  <define name="attlist.mode" combine="interleave">
+    <attribute name="name">
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="attlist.mode" combine="interleave">
+    <optional>
+      <attribute name="install"/>
+    </optional>
+  </define>
+  <define name="pipeline">
+    <element name="pipeline">
+      <ref name="attlist.pipeline"/>
+      <oneOrMore>
+        <ref name="program"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="attlist.pipeline" combine="interleave">
+    <empty/>
+  </define>
+  <define name="program">
+    <element name="program">
+      <ref name="attlist.program"/>
+      <zeroOrMore>
+        <ref name="file"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attlist.program" combine="interleave">
+    <attribute name="name"/>
+  </define>
+  <define name="attlist.program" combine="interleave">
+    <optional>
+      <attribute name="prefix"/>
+    </optional>
+  </define>
+  <define name="file">
+    <element name="file">
+      <ref name="attlist.file"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="attlist.file" combine="interleave">
+    <attribute name="name"/>
+  </define>
+  <start>
+    <choice>
+      <ref name="modes"/>
+    </choice>
+  </start>
+</grammar>
