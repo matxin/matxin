@@ -538,17 +538,19 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
+//  config cfg(argc, argv);
 
   // Output in the locale's encoding
   locale::global(locale(""));
 
-  init_verbTrasference(cfg.Verb_TransferFile, cfg.DoVerbTrace);
+  string verbTransferFile = string(argv[1]);
+  //init_verbTrasference(verbTransferFile, cfg.DoVerbTrace);
+  init_verbTrasference(verbTransferFile, false);
 
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
     // libXml liburutegiko reader hasieratzen da, sarrera estandarreko fitxategia irakurtzeko.
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0, "", NULL, 0);
@@ -582,13 +584,14 @@ int main(int argc, char *argv[])
       wcout << tree << endl;
       wcout.flush();
   
-      if (cfg.DoTrace)
+      //if (cfg.DoTrace)
+      if (false)
       {
         ostringstream log_fileName_osoa;
         wofstream log_file;
   
 	log_fileName_osoa.imbue(std::locale("C"));
-        log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
+//        log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
   
         log_file.open(log_fileName_osoa.str().c_str(), wofstream::out | wofstream::app);
 	log_file << L"<!-- verb-transference -->" << endl;
@@ -613,8 +616,9 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 
 }
