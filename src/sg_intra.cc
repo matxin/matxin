@@ -312,19 +312,20 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
-
   // Output in the locale's encoding
   locale::global(locale(""));
 
   //ordena definitu ahal izateko kategoria (DET-en azpikategoria) aldaketen biltegia hasieratu...
-  init_lexInfo(L"orderPos", cfg.POS_ToOrderFile);
-  init_node_order(cfg.Node_OrderFile);
+  string nodeOrderFile = string(argv[1]);
+  string posToOrderFile = string(argv[2]);
+
+  init_lexInfo(L"orderPos", posToOrderFile);
+  init_node_order(nodeOrderFile);
 
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0, "", NULL, 0);
   
@@ -357,13 +358,14 @@ int main(int argc, char *argv[])
       wcout << tree << endl;
       wcout.flush();
   
-      if (cfg.DoTrace)
+      //if (cfg.DoTrace)
+      if (false)
       {
         ostringstream log_fileName_osoa;
         wofstream log_file;
   
 	log_fileName_osoa.imbue(std::locale("C"));
-        log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
+        //log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
   
         log_file.open(log_fileName_osoa.str().c_str(), ofstream::out | ofstream::app);
 	log_file << L"<!-- Syntactic generation -->" << endl;
@@ -388,8 +390,9 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 }
 
