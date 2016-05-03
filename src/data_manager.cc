@@ -1129,7 +1129,7 @@ void init_lexical_selection(string filename)
 
 vector<wstring>
   lexical_selection(wstring parent_attributes, wstring common_attribs,
-                  vector<wstring> child_attributes, config &cfg)
+                  vector<wstring> child_attributes)
 {
   wstring src_lemma;
   wstring trgt_lemma;
@@ -1153,7 +1153,8 @@ vector<wstring>
       if (current_rule.default_value == L"+")
 	default_case.insert(default_case.begin(), child_attributes[i]);
 
-      if (cfg.UseLexRules && current_rule.condition != L"" and
+      //if (cfg.UseLexRules && current_rule.condition != L"" and
+      if (current_rule.condition != L"" and
 	  apply_condition(current_rule.condition,
 			  attributes, parent_attributes))
 	{

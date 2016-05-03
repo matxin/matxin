@@ -36,6 +36,8 @@ using namespace std;
 
 FSTProcessor fstp;
 
+bool doTrace = false ;
+
 
 wstring upper_type(wstring form, wstring mi, wstring ord)
 {
@@ -279,7 +281,7 @@ wstring multiNodes (xmlTextReaderPtr reader, wstring &full, wstring attributes)
 //    - Hitz horren semantika begiratzen da
 // - NODEaren azpian dauden NODEak irakurri eta prozesatzen ditu.
 wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
-                       wstring parent_attribs, wstring& attributes, config &cfg)
+                       wstring parent_attribs, wstring& attributes)
 {
   wstring nodes;
   wstring subnodes;
@@ -322,7 +324,7 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
                              attrib(reader, "mi"), unknown);
 
       if (trad.size() > 1)
-        select = lexical_selection(parent_attribs, attributes, trad, cfg);
+        select = lexical_selection(parent_attribs, attributes, trad);
       else
         select = trad;
 
@@ -389,10 +391,10 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
          tagType == XML_READER_TYPE_ELEMENT)
   {
     // NODEa irakurri eta prozesatzen du.
-    //nodes += procNODE_notAS(reader, head_child, attributes, cfg);
+    //nodes += procNODE_notAS(reader, head_child, attributes);
 
     wstring NODOA = procNODE_notAS(reader, head_child, attribs,
-                                   child_attributes, cfg);
+                                   child_attributes);
     nodes += NODOA;
 
     ret = nextTag(reader);
@@ -533,7 +535,7 @@ wstring procNODE_AS(xmlTextReaderPtr reader, bool head, wstring& attributes)
 // - type : CHUNKaren type atributua itzultzen da
 // - CHUNK motaren arabera tratamendu desberdina egiten da (procNODE_AS edo procNODE_notAS)
 // - CHUNK honen barruan dauden beste CHUNKak irakurri eta prozesatzen ditu.
-wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs, config cfg)
+wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs)
 {
   wstring tagName = getTagName(reader);
   int tagType = xmlTextReaderNodeType(reader);
@@ -575,7 +577,7 @@ wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs, config cfg)
   else
   {
     // NODEa irakurri eta prozesatzen du
-    wstring NODOA = procNODE_notAS(reader, true, parent_attribs, head_attribs, cfg);
+    wstring NODOA = procNODE_notAS(reader, true, parent_attribs, head_attribs);
     tree += NODOA;
   }
 
@@ -587,7 +589,7 @@ wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs, config cfg)
   while (ret == 1 and tagName == L"CHUNK" and tagType == XML_READER_TYPE_ELEMENT)
   {
     // CHUNK irakurri eta prozesatzen du.
-    tree += procCHUNK(reader, head_attribs, cfg);
+    tree += procCHUNK(reader, head_attribs);
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -612,7 +614,7 @@ wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs, config cfg)
 // SENTENCE etiketa irakurri eta prozesatzen du:
 // - ord -> ref : ord atributuan dagoen balioa, ref atributuan idazten du (helmugak jatorrizkoaren erreferentzia izateko postedizioan)
 // - SENTENCE barruan dauden CHUNKak irakurri eta prozesatzen ditu.
-wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
+wstring procSENTENCE (xmlTextReaderPtr reader)
 {
   wstring tree;
   wstring tagName = getTagName(reader);
@@ -640,7 +642,7 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
   while (ret == 1 and tagName == L"CHUNK")
   {
     // CHUNKa irakurri eta prozesatzen du.
-    tree += procCHUNK(reader, L"", cfg);
+    tree += procCHUNK(reader, L"");
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -665,29 +667,39 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
-
   // This sets the C++ locale and affects to C and C++ locales.
   // wcout.imbue doesn't have any effect but the in/out streams use the proper encoding.
   locale::global(locale(""));
 
+//        <file name="spa-eus.bilingual.bin"/>
+//        <file name="spa-eus.chunk_type.dat"/> <!-- matxin-spa-eus.chunk_type.dat -->
+//        <file name="spa-eus.lexical_selection.dat"/> <!-- matxin-spa-eus.lexical_selection.dat -->
+//        <file name="eus.semantic.dat"/> <!-- matxin-eus.semantic.dat -->
+
+
+  string dictionaryFile = string(argv[1]);
+  string chunkTypeDictFile = string(argv[2]);
+  string lexSelFile = string(argv[3]);
+  string nounSemanticFile = string(argv[4]);
+
   // Hiztegi elebidunaren hasieraketa.
   // Parametro moduan jasotzen den fitxagia erabiltzen da hasieraketarako.
-  FILE *transducer = fopen(cfg.DictionaryFile.c_str(), "r");
+  FILE *transducer = fopen(dictionaryFile.c_str(), "r");
   fstp.load(transducer);
   fclose(transducer);
   fstp.initBiltrans();
 
   // Hasieraketa hauek konfigurazio fitxategi batetik irakurri beharko lirateke.
-  init_lexInfo(L"nounSem", cfg.Noun_SemanticFile);
-  init_lexInfo(L"chunkType", cfg.ChunkType_DictFile);
+  init_lexInfo(L"nounSem", nounSemanticFile);
+  init_lexInfo(L"chunkType", chunkTypeDictFile);
   // Init lexical selection reading the rules file
-  init_lexical_selection(cfg.LexSelFile);
+  init_lexical_selection(lexSelFile);
 
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
+
     // libXml liburutegiko reader hasieratzen da, sarrera estandarreko fitxategia irakurtzeko.
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0, "", NULL, 0);
@@ -717,17 +729,17 @@ int main(int argc, char *argv[])
     while (ret == 1 and tagName == L"SENTENCE")
     {
       //SENTENCE irakurri eta prozesatzen du.
-      wstring tree = procSENTENCE(reader, cfg);
+      wstring tree = procSENTENCE(reader);
       wcout << tree << endl;
       wcout.flush();
   
-      if (cfg.DoTrace)
+      if (doTrace)
       {
         ostringstream log_fileName_osoa;
         wofstream log_file;
   
 	log_fileName_osoa.imbue(std::locale("C"));
-        log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
+        log_fileName_osoa << "/dev/stderr" << i++ << ".xml";
   
         log_file.open(log_fileName_osoa.str().c_str(),
                       wofstream::out | wofstream::app);
@@ -754,8 +766,9 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 }
 

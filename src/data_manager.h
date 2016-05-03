@@ -74,7 +74,7 @@ void
   init_lexical_selection(string filename);
 vector<wstring>
   lexical_selection(wstring parent_attributes, wstring common_attributes,
-                    vector<wstring> child_attributes, config &cfg);
+                    vector<wstring> child_attributes);
 
 void init_verb_subcategorisation(string fitxName);
 wstring verb_subcategorisation(wstring verb_lemma, vector<vector<wstring> > &cases, vector<wstring> &attributes, vector<wstring> &subj_cases, wstring subj_attributes, wstring sentenceref, int sentencealloc, config &cfg);
