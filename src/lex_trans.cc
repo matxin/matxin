@@ -677,6 +677,7 @@ int main(int argc, char *argv[])
 //        <file name="eus.semantic.dat"/> <!-- matxin-eus.semantic.dat -->
 
 
+  // Add error checking 
   string dictionaryFile = string(argv[1]);
   string chunkTypeDictFile = string(argv[2]);
   string lexSelFile = string(argv[3]);
