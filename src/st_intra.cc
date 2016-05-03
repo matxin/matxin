@@ -313,18 +313,17 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
-
 
   // Output in the locale's encoding
   locale::global(locale(""));
 
-  init_nodeMovement(cfg.Intra_MovementsFile);
+  string intraMovementsFile = string(argv[1]);
+  init_nodeMovement(intraMovementsFile);
 
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
     // libXml liburutegiko reader hasieratzen da, sarrera estandarreko fitxategia irakurtzeko.
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0,"", NULL, 0);
@@ -373,8 +372,9 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 }
 

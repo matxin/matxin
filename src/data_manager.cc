@@ -997,7 +997,7 @@ void init_preposition_transference(string fitxName)
 
 vector<wstring>
   preposition_transference(wstring parent_attributes, wstring child_attributes,
-                           wstring sentenceref, int sentencealloc, config &cfg)
+                           wstring sentenceref, int sentencealloc)
 {
   vector<wstring> maintain_cases;
 
@@ -1009,35 +1009,40 @@ vector<wstring>
 
   if (prepositions[prep].size() == 0)
   {
-    maintain_cases.push_back(L"[ZERO]");
+    maintain_cases.push_back(L"[ZERO]"); // FIXME: ETIKETA
     wcerr << L"WARNING: unknown preposition " << prep << endl;
     return maintain_cases;
   }
 
   vector<preposition> current_prep = prepositions[prep];
 
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
     wcerr << sentenceref << L":" << alloc << L":" << prep << "\n\tparent:" << parent_attributes << "\n\tchild:" << child_attributes << endl;
   for (size_t i = 0; i < current_prep.size(); i++)
   {
-    if (cfg.DoPrepTrace)
+    //if (cfg.DoPrepTrace)
+    if (false) {
       wcerr << L"\t" << current_prep[i].cas << L"::"
             << current_prep[i].condition << L"::" << current_prep[i].maintain
             << endl;
+    }
     if (current_prep[i].maintain == L"+")
       maintain_cases.push_back(current_prep[i].cas);
 
-    if (cfg.UsePrepRules and current_prep[i].condition != L"-" and
+    if (current_prep[i].condition != L"-" and
         apply_condition(current_prep[i].condition, child_attributes, parent_attributes))
     {
       vector<wstring> translation_case;
 
       translation_case.push_back(current_prep[i].cas);
 
-      if (cfg.DoPrepTrace)
+    //if (cfg.DoPrepTrace)
+      if (false) {
         wcerr << endl << L"ERREGELEN BIDEZ ITZULI DA (" << sentenceref
               << L":" << alloc << L":" << prep << L"): " << current_prep[i].cas
               << endl << endl;
+      }
       return translation_case;
     }
   }
@@ -1048,7 +1053,8 @@ vector<wstring>
     wcerr << L"WARNING: unknown preposition " << prep << endl;
   }
 
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
   {
     wcerr << endl << L"HIZTEGIKO ERANTZUNA(" << sentenceref << L":" << alloc
           << L":" << prep << L"): ";
@@ -1328,7 +1334,7 @@ wstring
   verb_subcategorisation(wstring verb_lemma, vector<vector<wstring> > &cases,
                          vector<wstring> &attributes, vector<wstring> &subj_cases,
                          wstring subj_attributes, wstring sentenceref,
-                         int sentencealloc, config &cfg)
+                         int sentencealloc)
 {
   wstring lemma_root = verb_lemma;
   size_t pos = verb_lemma.find(L'_');
@@ -1337,13 +1343,16 @@ wstring
   vector<subcategorisation> subcat = subcategorisations[verb_lemma];
   if (subcat.size() == 0) 
   {
-    if (cfg.DoPrepTrace)
+    //if (cfg.DoPrepTrace) {
+    if (false) {
       wcerr << L"'" << verb_lemma << L"' sarrerak ez du azpikategorizazio informaziorik, horren ordez '" << lemma_root << L"' erabiliko da" << endl;
+    }
     verb_lemma = lemma_root;
     subcat = subcategorisations[lemma_root];
   }
 
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
   {
     wcerr << L"AZPIKATEGORIZAZIOA APLIKATZEN: " << verb_lemma << L"-" << lemma_root << L" (" << subcat.size() << L" azpikategorizazio desberdin aurkitu dira)" << endl;
     wstring prep = text_attrib(subj_attributes, L"prep");
@@ -1411,16 +1420,19 @@ wstring
         subcat_length++;
     }
 
-    if (cfg.DoPrepTrace)
+    //if (cfg.DoPrepTrace) {
+    if (false) {
       wcerr << subcat_pattern << L"/" << subcat[i].subj_case << L"/"
             << subcat[i].trans << L" || " << fixed_cases  << L"/"
             << cases_size << L"/" << subcat_length << endl;
+    }
 
     if (fixed_cases == cases_size && (matches_subj))
     {
       cases = final_cases;
 
-      if (cfg.DoPrepTrace)
+      //if (cfg.DoPrepTrace)
+      if (false)
       {
         wstring prep = text_attrib(subj_attributes, L"prep");
         if (prep == L"")
@@ -1469,7 +1481,8 @@ wstring
     subj_cases.push_back(L"[" + best_subj_case + L"]");
   }
 
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
   {
     wstring prep = text_attrib(subj_attributes, L"prep");
     if (prep == L"")
@@ -1520,9 +1533,11 @@ void init_verb_noun_subcategorisation(string fitxName)
         i--;
       }
     }
-    if (lerro[lerro.size() - 1] == L' ' or lerro[lerro.size() - 1] == L'\t')
-      lerro.erase(lerro.size() - 1, 1);
-
+    if (lerro[lerro.size() - 1] == L' ' or lerro[lerro.size() - 1] == L'\t') {
+      if(lerro.size() != 0) {
+        lerro.erase(lerro.size() - 1, 1);
+      }
+    }
     size_t sep1 = lerro.find(L"\t");
     if (sep1 == wstring::npos)
       continue;
@@ -1574,7 +1589,7 @@ wstring to_upper(wstring input)
 vector<wstring>
   verb_noun_subcategorisation(wstring verb_lemma, wstring chunk_head,
                               vector<wstring> &cases, wstring &attributes,
-                              wstring sentenceref, int sentencealloc, config &cfg)
+                              wstring sentenceref, int sentencealloc)
 {
   vector<wstring> subcat = verb_noun_subcat[verb_lemma][chunk_head];
 
@@ -1582,7 +1597,8 @@ vector<wstring>
   wstring prep = text_attrib(attributes, L"prep");
   if (prep == L"")
     prep = L"-";
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
   {
     wcerr << sentenceref << L":" << alloc << L":" << prep
           << L"\tTRIPLETEN APLIKAZIOA: " << verb_lemma << L","
@@ -1629,7 +1645,8 @@ vector<wstring>
 
     if (output.size() > 0)
     {
-      if (cfg.DoPrepTrace)
+      //if (cfg.DoPrepTrace)
+      if (false)
       {
         wcerr << sentenceref << L":" << alloc << L":" << prep
               << L"\tTRIPLETEKIN ONDOREN KASU POSIBLEAK: ";
@@ -1644,7 +1661,8 @@ vector<wstring>
     }
   }
 
-  if (cfg.DoPrepTrace)
+  //if (cfg.DoPrepTrace)
+  if (false)
   {
     wcerr << sentenceref << L":" << alloc << L":" << prep
           << L"\tTRIPLETEKIN ONDOREN KASU POSIBLEAK: ";

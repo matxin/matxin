@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <format name="txt">
   <options>
     <largeblocks size="8192"/>
-    <input encoding="ISO-8859-1"/>
-    <output encoding="ISO-8859-1"/>
+    <input encoding="UTF-8"/>
+    <output encoding="UTF-8"/>
     <tag-name regexp='[^ \n\t\r]'/>
     <escape-chars regexp='[][\\/@&lt;&gt;^]'/>
     <space-chars regexp='[ \n\t\r$*]'/>

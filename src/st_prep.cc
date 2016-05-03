@@ -197,7 +197,7 @@ wstring procNODE(xmlTextReaderPtr reader, int &length)
 // - NODOrik gabe gelditzen diren CHUNKak desagertzen dira.
 vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent,
                           vector<wstring> &chunk_attributes, wstring sentenceref,
-                          int sentencealloc, config &cfg)
+                          int sentencealloc)
 {
   vector<wstring> chunk_subTrees;
   wstring tagName = getTagName(reader);
@@ -241,7 +241,7 @@ vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent
     // Menpeko CHUNKak irakurri eta tratatzen dira. Gamatika baten arabera
     // zenbait attributu mugitzen dira CHUNK batetik bestera.
     vector<wstring> child_attributes;
-    vector<wstring> child_subTree = procCHUNK(reader, my_attributes, child_attributes, sentenceref, sentencealloc, cfg);
+    vector<wstring> child_subTree = procCHUNK(reader, my_attributes, child_attributes, sentenceref, sentencealloc);
 
     for (size_t i = 0; i < child_attributes.size(); i++)
     {
@@ -272,7 +272,7 @@ vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent
       //   cases.push_back(text_attrib(chunk_attributes[i], L"rel"));
       // }
       else
-        cases  = preposition_transference(my_attributes, chunk_attributes[i], sentenceref, sentencealloc, cfg);
+        cases  = preposition_transference(my_attributes, chunk_attributes[i], sentenceref, sentencealloc);
 
       chunk_cases.push_back(cases);
     }
@@ -285,61 +285,53 @@ vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent
       if (verb_lemma[0]=='_' && verb_lemma[verb_lemma.size() - 1]=='_')
         verb_lemma = verb_lemma.substr(1, verb_lemma.size() - 2);
 
-      if (cfg.UseTripletes)
+      //0. Ratnaparki
+      for (size_t i = 0; i < chunk_attributes.size(); i++)
       {
-        //0. Ratnaparki
-        for (size_t i = 0; i < chunk_attributes.size(); i++)
+        wstring chunk_head = text_attrib(chunk_attributes[i], L"headlem");
+        vector<wstring> new_cases =verb_noun_subcategorisation(verb_lemma, chunk_head, chunk_cases[i], chunk_attributes[i], sentenceref, sentencealloc);
+        chunk_cases.erase(chunk_cases.begin() + i);
+        chunk_cases.insert(chunk_cases.begin() + i, new_cases);
+      }
+
+      //1. subjektua bereiztu.
+      vector<wstring> subj_cases;
+
+      vector<int> subj_index;
+      vector<wstring> subj_attributes;
+      vector<wstring> subj_subTree;
+      for (int i = 0; i < int(chunk_attributes.size()); i++)
+      {
+        if (text_attrib(chunk_attributes[i], L"subject") == L"true")
         {
-          wstring chunk_head = text_attrib(chunk_attributes[i], L"headlem");
-          vector<wstring> new_cases =verb_noun_subcategorisation(verb_lemma, chunk_head, chunk_cases[i], chunk_attributes[i], sentenceref, sentencealloc, cfg);
+          merge_cases(subj_cases, chunk_cases[i]);
           chunk_cases.erase(chunk_cases.begin() + i);
-          chunk_cases.insert(chunk_cases.begin() + i, new_cases);
+
+          subj_index.push_back(i + subj_index.size());
+
+          subj_attributes.push_back(chunk_attributes[i]);
+          chunk_attributes.erase(chunk_attributes.begin() + i);
+
+          subj_subTree.push_back(chunk_subTrees[i]);
+          chunk_subTrees.erase(chunk_subTrees.begin() + i);
+
+          i--;
         }
       }
+      //2. aditz horren agerpenak begiratu menpekoen casuak bereizteko.
+      wstring subj_attrib;
+      if (subj_attributes.size() > 0)
+        subj_attrib = subj_attributes[0];
+      wstring trans = verb_subcategorisation(verb_lemma, chunk_cases, chunk_attributes, subj_cases, subj_attrib, sentenceref, sentencealloc);
+      my_attributes += L" trans='" + trans + L"'";
 
-      if (cfg.UseSubcat)
+      //3. subjektu beste menpekoekin batera jarri.
+      for (size_t i = 0; i < subj_index.size(); i++)
       {
-        //1. subjektua bereiztu.
-        vector<wstring> subj_cases;
-
-        vector<int> subj_index;
-        vector<wstring> subj_attributes;
-        vector<wstring> subj_subTree;
-        for (int i = 0; i < int(chunk_attributes.size()); i++)
-        {
-          if (text_attrib(chunk_attributes[i], L"subject") == L"true")
-          {
-            merge_cases(subj_cases, chunk_cases[i]);
-            chunk_cases.erase(chunk_cases.begin() + i);
-
-            subj_index.push_back(i + subj_index.size());
-
-            subj_attributes.push_back(chunk_attributes[i]);
-            chunk_attributes.erase(chunk_attributes.begin() + i);
-
-            subj_subTree.push_back(chunk_subTrees[i]);
-            chunk_subTrees.erase(chunk_subTrees.begin() + i);
-
-            i--;
-          }
-        }
-
-        //2. aditz horren agerpenak begiratu menpekoen casuak bereizteko.
-        wstring subj_attrib;
-        if (subj_attributes.size() > 0)
-          subj_attrib = subj_attributes[0];
-        wstring trans = verb_subcategorisation(verb_lemma, chunk_cases, chunk_attributes, subj_cases, subj_attrib, sentenceref, sentencealloc, cfg);
-        my_attributes += L" trans='" + trans + L"'";
-
-        //3. subjektu beste menpekoekin batera jarri.
-        for (size_t i = 0; i < subj_index.size(); i++)
-        {
-          chunk_cases.insert(chunk_cases.begin() + subj_index[i], subj_cases);
-          chunk_attributes.insert(chunk_attributes.begin() + subj_index[i], subj_attributes[i]);
-          chunk_subTrees.insert(chunk_subTrees.begin() + subj_index[i], subj_subTree[i]);
-        }
+        chunk_cases.insert(chunk_cases.begin() + subj_index[i], subj_cases);
+        chunk_attributes.insert(chunk_attributes.begin() + subj_index[i], subj_attributes[i]);
+        chunk_subTrees.insert(chunk_subTrees.begin() + subj_index[i], subj_subTree[i]);
       }
-
     }
 
     // Kasuak idazten dira (azpikategorizazioan ebatzi bada, dagoen bakarra, bestela dagoen lehenengoa.)
@@ -351,11 +343,13 @@ vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent
       if (prep == L"")
         prep = L"-";
 
-      if (cfg.first_case || chunk_cases[i].size() == 1)
+      //if (cfg.first_case || chunk_cases[i].size() == 1)
+      if (chunk_cases[i].size() == 1)
       {
-        if (chunk_cases[i][0] != L"" && chunk_cases[i][0] != L"[ZERO]")
+        if (chunk_cases[i][0] != L"" && chunk_cases[i][0] != L"[ZERO]") // FIXME: ETIKETA
         {
-          if (chunk_cases[i].size() != 1 && cfg.DoPrepTrace)
+          //if (chunk_cases[i].size() != 1 && cfg.DoPrepTrace)
+          if (chunk_cases[i].size() != 1 && false)
           {
             wcerr << sentenceref << L":" << alloc << L":"
                   << prep << L" ANBIGUOA GELDITU DA (";
@@ -409,7 +403,7 @@ vector<wstring> procCHUNK(xmlTextReaderPtr reader, wstring &attributesFromParent
 }
 
 
-wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
+wstring procSENTENCE (xmlTextReaderPtr reader)
 {
   //SENTENCE etiketa irakurri eta tratatzen du.
   wstring tree, ref;
@@ -442,7 +436,7 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
     vector<wstring> child_attributes;
     vector<vector<wstring> > chunk_cases;
 
-    vector<wstring> subTree = procCHUNK(reader, input, child_attributes, ref, sentencealloc, cfg);
+    vector<wstring> subTree = procCHUNK(reader, input, child_attributes, ref, sentencealloc);
 
     //Preposizioen itzulpena.
     for (size_t i = 0; i < child_attributes.size(); i++)
@@ -459,7 +453,7 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
       //   cases.push_back(text_attrib(child_attributes[i], L"rel"));
       // }
       else
-        cases  = preposition_transference(L"", child_attributes[i], ref, sentencealloc, cfg);
+        cases  = preposition_transference(L"", child_attributes[i], ref, sentencealloc);
 
       chunk_cases.push_back(cases);
     }
@@ -472,12 +466,14 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
       if (prep == L"")
         prep = L"-";
 
-      if ((!cfg.first_case && chunk_cases[i].size() != 1) or 
-          chunk_cases[i][0] == L"" || chunk_cases[i][0] == L"[ZERO]")
+      //if ((!cfg.first_case && chunk_cases[i].size() != 1) or 
+      if ((false && chunk_cases[i].size() != 1) or 
+          chunk_cases[i][0] == L"" || chunk_cases[i][0] == L"[ZERO]") // FIXME: ETIKETA
         tree += L"<CHUNK" + write_xml(child_attributes[i]) + L">\n" + subTree[i];
       else
       {
-        if (chunk_cases[i].size() != 1 && cfg.DoPrepTrace)
+        //if (chunk_cases[i].size() != 1 && cfg.DoPrepTrace)
+        if (chunk_cases[i].size() != 1 && false)
         {
           wcerr << ref << L":" << alloc << L":"
                 << prep << L" ANBIGUOA GELDITU DA (";
@@ -521,22 +517,21 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config &cfg)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
 
   // Output in the locale's encoding
   locale::global(locale(""));
 
-  init_preposition_transference(cfg.PrepositionsFile);
-  if (cfg.UseSubcat)
-    init_verb_subcategorisation(cfg.SubcatFile);
-  if (cfg.UseTripletes)
-    init_verb_noun_subcategorisation(cfg.Noun_SubcatFile);
-
+  string prepositionsFile = string(argv[1]);
+  string subcatFile = string(argv[2]);
+  string nounSubcatFile = string(argv[3]);
+  init_preposition_transference(prepositionsFile);
+  init_verb_subcategorisation(subcatFile);
+  init_verb_noun_subcategorisation(nounSubcatFile);
   
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
     // libXml liburutegiko reader hasieratzen da, sarrera estandarreko fitxategia irakurtzeko.
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0,"", NULL, 0);
@@ -565,7 +560,7 @@ int main(int argc, char *argv[])
     while (ret == 1 and tagName == L"SENTENCE")
     {
       // SENTENCE irakurri eta prozesatzen du.
-      wcout << procSENTENCE(reader, cfg) << endl;
+      wcout << procSENTENCE(reader) << endl;
       cout.flush();
   
       ret = nextTag(reader);
@@ -585,8 +580,9 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 }
 
