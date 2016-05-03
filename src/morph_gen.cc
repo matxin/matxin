@@ -23,7 +23,7 @@ FSTProcessor fstp_nolex_generation;
 // Hiztegi elebidunaren euskarazko ordainetik lehenengoa lortzen du.
 // IN:  Euskarazko ordainak ( ordain1[/ordain2]* )
 // OUT: lehenengoa          ( oradin1            )
-wstring disanbiguate(wstring &full)
+wstring disambiguate(wstring &full)
 {
   wstring output = full;
 
@@ -62,13 +62,15 @@ wstring keep_case(wstring form, wstring UpCase)
 
 
 wstring verb_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
-                        wstring mi, wstring head_sem, bool &flexioned, config cfg)
+                        wstring mi, wstring head_sem, bool &flexioned)
 {
-  wstring analisys, form, prefix, postposizio, pre_lemma, lemma_osoa;
+  wstring analisis, form, prefix, postposizio, pre_lemma, lemma_osoa;
   lemma_osoa = lemma;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemma << L" " << pos << L" " << mi << L" " << cas << endl;
+  }
 
   for (size_t i = 0; i < lemma.size(); i++)
   {
@@ -145,11 +147,15 @@ wstring verb_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
   }
 
   wstring pre_gen = L"^" + lemma_osoa + pos + L"$";
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << pre_gen << endl;
+  }
   wstring lemmaMorf = fstp_pre_generation.biltrans(pre_gen);
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemmaMorf << endl;
+  }
 
   if (lemmaMorf[0] == L'^' and lemmaMorf[1] == L'@')
     lemmaMorf = lemma + pos + mi;
@@ -167,57 +173,68 @@ wstring verb_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
 
   lemmaMorf = prefix + lemmaMorf;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemmaMorf << endl;
+  }
 
+  analisis = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
 
-  analisys = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
+  //if (cfg.DoGenTrace) {
+  if (false) {
+    wcerr << analisis << endl;
+  }
 
-  if (cfg.DoGenTrace)
-    wcerr << analisys << endl;
-
-  if (analisys.find(L"LemaMorf") != wstring::npos)
-    analisys.replace(analisys.find(L"LemaMorf"), 8, lemmaMorf);
-  if (analisys.find(L"Lema") != wstring::npos)
-    analisys.replace(analisys.find(L"Lema"), 4, lemma);
-  if (analisys.find(L"Num") != wstring::npos)
-    analisys.replace(analisys.find(L"Num"), 3, mi);
-  if (analisys.find(L"Kas") != wstring::npos)
+  if (analisis.find(L"LemaMorf") != wstring::npos)
+    analisis.replace(analisis.find(L"LemaMorf"), 8, lemmaMorf);
+  if (analisis.find(L"Lema") != wstring::npos)
+    analisis.replace(analisis.find(L"Lema"), 4, lemma);
+  if (analisis.find(L"Num") != wstring::npos)
+    analisis.replace(analisis.find(L"Num"), 3, mi);
+  if (analisis.find(L"Kas") != wstring::npos)
   {
-    analisys.replace(analisys.find(L"Kas"), 3, cas);
+    analisis.replace(analisis.find(L"Kas"), 3, cas);
     flexioned = true;
   }
 
-  for (int i = 0; i < int(analisys.size()); i++)
+  for (int i = 0; i < int(analisis.size()); i++)
   {
-    if (analisys[i] == L'[')
-      analisys[i]= L'<';
-    if (analisys[i] == L']')
-      analisys[i]= L'>';
-    if (analisys[i] == L' ' )
+    if (analisis[i] == L'[')
+      analisis[i]= L'<';
+    if (analisis[i] == L']')
+      analisis[i]= L'>';
+    if (analisis[i] == L' ' )
     {
-      analisys.erase(i, 1);
+      analisis.erase(i, 1);
       i--;
     }
   }
 
-  if (cfg.DoGenTrace)
-    wcerr << L"GEN:" << analisys << endl;
-  form = fstp_generation.biltrans(analisys);
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
+    wcerr << L"GEN:" << analisis << endl;
+  }
+  form = fstp_generation.biltrans(analisis);
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << L"GEN:" << form << endl;
+  }
 
   form = form.substr(1, form.size() - 2);
 
   if (form.size() == 0 or form[0] == '@' or
       form.find(L"<") != wstring::npos or form.find(L">") != wstring::npos)
   {
-    if (cfg.DoGenTrace)
-      wcerr << L"GEN nolex:" << analisys << endl;
-    form = fstp_nolex_generation.biltrans(analisys);
+    //if (cfg.DoGenTrace) {
+    if (false) {
+      wcerr << L"GEN nolex:" << analisis << endl;
+    }
+    form = fstp_nolex_generation.biltrans(analisis);
     form = form.substr(1, form.size() - 2);
-    if (cfg.DoGenTrace)
+    //if (cfg.DoGenTrace) {
+    if (false) {
       wcerr << L"GEN nolex:" << form << endl << endl;
+    }
     if (form.size() == 0 or form[0] == L'@' or
         form.find(L"<") != wstring::npos or form.find(L">") != wstring::npos)
     {
@@ -225,24 +242,28 @@ wstring verb_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     }
   }
 
-  form = disanbiguate(form);
+  form = disambiguate(form);
   form = pre_lemma + form;
   form += postposizio;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << form << endl << endl;
+  }
 
   return form;
 }
 
 
 wstring number_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
-                          wstring mi, wstring head_sem, bool &flexioned, config cfg)
+                          wstring mi, wstring head_sem, bool &flexioned)
 {
-  wstring analisys, form, prefix, postposizio, pre_lemma, lemma_osoa;
+  wstring analisis, form, prefix, postposizio, pre_lemma, lemma_osoa;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemma << L" " << pos << L" " << mi << L" " << cas << endl;
+  }
 
   if (pos == L"[Zu]" || pos == L"[Zm]")
   {
@@ -272,49 +293,56 @@ wstring number_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
   if (cas != L"")
   {
     wstring lemmaMorf = lemma + pos;
-    if (cfg.DoGenTrace)
+    //if (cfg.DoGenTrace) {
+    if (false) {
       wcerr << prefix << L" " << lemmaMorf << L" " << mi << L" " << cas << head_sem << endl;
+    }
 
-    analisys = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
+    analisis = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
 
-    if (cfg.DoGenTrace) wcerr << analisys << endl;
+    //if (cfg.DoGenTrace) wcerr << analisis << endl;
+    if (false) wcerr << analisis << endl;
 
-    if (analisys.find(L"LemaMorf") != wstring::npos)
-      analisys.replace(analisys.find(L"LemaMorf"), 8, lemmaMorf);
-    if (analisys.find(L"Lema") != wstring::npos)
-      analisys.replace(analisys.find(L"Lema"), 4, lemma);
-    if (analisys.find(L"Num") != wstring::npos)
-      analisys.replace(analisys.find(L"Num"), 3, mi);
-    if (analisys.find(L"Kas") != wstring::npos)
-      analisys.replace(analisys.find(L"Kas"), 3, cas);
+    if (analisis.find(L"LemaMorf") != wstring::npos)
+      analisis.replace(analisis.find(L"LemaMorf"), 8, lemmaMorf);
+    if (analisis.find(L"Lema") != wstring::npos)
+      analisis.replace(analisis.find(L"Lema"), 4, lemma);
+    if (analisis.find(L"Num") != wstring::npos)
+      analisis.replace(analisis.find(L"Num"), 3, mi);
+    if (analisis.find(L"Kas") != wstring::npos)
+      analisis.replace(analisis.find(L"Kas"), 3, cas);
 
     flexioned = true;
   }
   else
   {
-    analisys = L"^" + lemma + pos + L"$";
+    analisis = L"^" + lemma + pos + L"$";
     postposizio = L"";
     flexioned = false;
   }
 
-  for (int i = 0; i < int(analisys.size()); i++)
+  for (int i = 0; i < int(analisis.size()); i++)
   {
-    if (analisys[i] == L'[')
-      analisys[i]= L'<';
-    if (analisys[i] == L']')
-      analisys[i]= L'>';
-    if (analisys[i] == L' ')
+    if (analisis[i] == L'[')
+      analisis[i]= L'<';
+    if (analisis[i] == L']')
+      analisis[i]= L'>';
+    if (analisis[i] == L' ')
     {
-      analisys.erase(i, 1);
+      analisis.erase(i, 1);
       i--;
     }
   }
 
-  if (cfg.DoGenTrace)
-    wcerr << L"GEN:" << analisys << endl;
-  form = fstp_measures.biltrans(analisys);
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
+    wcerr << L"GEN:" << analisis << endl;
+  }
+  form = fstp_measures.biltrans(analisis);
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << L"GEN:" << form << endl;
+  }
 
   form = form.substr(1, form.size() - 2);
 
@@ -324,7 +352,7 @@ wstring number_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     form = lemma;
   }
 
-  form = disanbiguate(form);
+  form = disambiguate(form);
 
   form = form + postposizio;
 
@@ -334,21 +362,25 @@ wstring number_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
       form[i]= L' ';
   }
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << form << endl << endl;
+  }
 
   return form;
 }
 
 
 wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
-                        wstring mi, wstring head_sem, bool &flexioned, config cfg)
+                        wstring mi, wstring head_sem, bool &flexioned)
 {
-  wstring analisys, form, prefix, postposizio, pre_lemma, lemma_osoa;
+  wstring analisis, form, prefix, postposizio, pre_lemma, lemma_osoa;
   bool is_last = true;
 
-  if (cfg.DoGenTrace)
+//  if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemma << L" " << pos << L" " << mi << L" " << cas << endl;
+  }
 
   wstring century, week_day, day, month, year, hour, meridiam;
   wstring century_cas, week_day_cas, day_cas, month_cas, year_cas, hour_cas;
@@ -442,18 +474,18 @@ wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
 
   if (century != L"??")
     form = number_generation(century, L"[CN]", suf, century_cas, L"[NUMS]",
-                             head_sem, flexioned, cfg);
+                             head_sem, flexioned);
 
   if (year != L"??")
     form = number_generation(year, L"[Z]", suf, year_cas, L"[NUMS]", head_sem,
-                             flexioned, cfg);
+                             flexioned);
 
   if (month != L"??")
   {
     if (form != L"")
       form += L" ";
     form += number_generation(month, L"[MM]", suf, month_cas, L"[NUMS]",
-                              head_sem, flexioned, cfg);
+                              head_sem, flexioned);
   }
 
   if (day != L"??")
@@ -461,7 +493,7 @@ wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     if (form != L"")
       form += L" ";
     form += number_generation(day, L"[Z]", suf, day_cas, L"[NUMS]", head_sem,
-                              flexioned, cfg);
+                              flexioned);
   }
 
   if (week_day != L"??")
@@ -469,7 +501,7 @@ wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     if (form != L"")
       form += L", ";
     form += number_generation(week_day, L"[WD]", suf, week_day_cas, L"[NUMS]",
-                              head_sem, flexioned, cfg);
+                              head_sem, flexioned);
   }
 
   if (hour != L"??.??")
@@ -477,7 +509,7 @@ wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     if (form != L"")
       form += L", ";
     form += number_generation(hour, L"[Z]", suf, hour_cas, L"[MG]", head_sem,
-                              flexioned, cfg);
+                              flexioned);
     if (meridiam != L"??")
       form += L" (" + meridiam + L")";
   }
@@ -489,15 +521,16 @@ wstring date_generation(wstring lemma, wstring pos, wstring suf, wstring cas,
 
 
 wstring generation(wstring lemma, wstring pos, wstring suf, wstring cas,
-                   wstring mi, wstring head_sem, bool &flexioned,
-                   config cfg)
+                   wstring mi, wstring head_sem, bool &flexioned)
 {
-  wstring analisys, form, prefix, postposizio, pre_lemma, lemma_osoa;
+  wstring analisis, form, prefix, postposizio, pre_lemma, lemma_osoa;
   lemma_osoa = lemma;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemma << L" " << pos << L" " << suf << L" " << mi << L" "
           << cas << L" " << head_sem << endl;
+  }
 
   for (size_t i = 0; i < lemma.size(); i++)
   {
@@ -539,11 +572,15 @@ wstring generation(wstring lemma, wstring pos, wstring suf, wstring cas,
   }
 
   wstring pre_gen = L"^" + lemma_osoa + pos + L"$";
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << pre_gen << endl;
+  }
   wstring lemmaMorf = fstp_pre_generation.biltrans(pre_gen);
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemmaMorf << endl;
+  }
   if (lemmaMorf[0] == L'^' and lemmaMorf[1] == L'@')
     lemmaMorf = lemma + pos;
   else
@@ -561,53 +598,62 @@ wstring generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     }
   }
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << lemmaMorf << L" " << mi << L" " << cas << L" " << head_sem << endl;
+  }
+  analisis = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
 
-  analisys = L"^" + get_generation_order(prefix, lemmaMorf, mi, cas, head_sem) + L"$";
+  //if (cfg.DoGenTrace) {
+  if (false) {
+    wcerr << analisis << endl;
+  }
+  if (analisis.find(L"LemaMorf") != wstring::npos)
+    analisis.replace(analisis.find(L"LemaMorf"), 8, lemmaMorf);
+  if (analisis.find(L"Lema") != wstring::npos)
+    analisis.replace(analisis.find(L"Lema"), 4, lemma);
+  if (analisis.find(L"Num") != wstring::npos)
+    analisis.replace(analisis.find(L"Num"), 3, mi);
+  if (analisis.find(L"Kas") != wstring::npos)
+    analisis.replace(analisis.find(L"Kas"), 3, cas);
 
-  if (cfg.DoGenTrace)
-    wcerr << analisys << endl;
-
-  if (analisys.find(L"LemaMorf") != wstring::npos)
-    analisys.replace(analisys.find(L"LemaMorf"), 8, lemmaMorf);
-  if (analisys.find(L"Lema") != wstring::npos)
-    analisys.replace(analisys.find(L"Lema"), 4, lemma);
-  if (analisys.find(L"Num") != wstring::npos)
-    analisys.replace(analisys.find(L"Num"), 3, mi);
-  if (analisys.find(L"Kas") != wstring::npos)
-    analisys.replace(analisys.find(L"Kas"), 3, cas);
-
-  for (int i = 0; i < int(analisys.size()); i++)
+  for (int i = 0; i < int(analisis.size()); i++)
   {
-    if (analisys[i] == L'[')
-      analisys[i]= L'<';
-    if (analisys[i] == L']')
-      analisys[i]= L'>';
-    if (analisys[i] == L' ' )
+    if (analisis[i] == L'[')
+      analisis[i]= L'<';
+    if (analisis[i] == L']')
+      analisis[i]= L'>';
+    if (analisis[i] == L' ' )
     {
-      analisys.erase(i, 1);
+      analisis.erase(i, 1);
       i--;
     }
   }
 
-  if (cfg.DoGenTrace)
-    wcerr << L"GEN:" << analisys << endl;
-  form = fstp_generation.biltrans(analisys);
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace) {
+  if (false) {
+    wcerr << L"GEN:" << analisis << endl;
+  }
+  form = fstp_generation.biltrans(analisis);
+  //if (cfg.DoGenTrace) {
+  if (false) {
     wcerr << L"GEN:" << form << endl;
-
+  }
   form = form.substr(1, form.size() - 2);
 
   if (form.size() == 0 or form[0] == L'@' or
       form.find(L"<") != wstring::npos or form.find(L">") != wstring::npos)
   {
-    if (cfg.DoGenTrace)
-      wcerr << L"GEN nolex:" << analisys << endl;
-    form = fstp_nolex_generation.biltrans(analisys);
+    //if (cfg.DoGenTrace) {
+    if (false) {
+      wcerr << L"GEN nolex:" << analisis << endl;
+    }
+    form = fstp_nolex_generation.biltrans(analisis);
     form = form.substr(1, form.size() - 2);
-    if (cfg.DoGenTrace)
+    //if (cfg.DoGenTrace) {
+    if (false) {
       wcerr << L"GEN nolex:" << form << endl;
+    }
     if (form.size() == 0 or form[0] == L'@' or
         form.find(L"<") != wstring::npos or form.find(L">") != wstring::npos)
     {
@@ -615,12 +661,13 @@ wstring generation(wstring lemma, wstring pos, wstring suf, wstring cas,
     }
   }
 
-  form = disanbiguate(form);
+  form = disambiguate(form);
   form = pre_lemma + form + postposizio;
 
-  if (cfg.DoGenTrace)
+  //if (cfg.DoGenTrace)
+  if (false) {
     wcerr << form << endl << endl;
-
+  }
   return form;
 }
 
@@ -666,7 +713,7 @@ wstring procSYN (xmlTextReaderPtr reader)
   return syns;
 }
 
-wstring procNODE(xmlTextReaderPtr reader, wstring chunk_type, config cfg)
+wstring procNODE(xmlTextReaderPtr reader, wstring chunk_type)
 {
   wstring nodes;
   wstring tagName = getTagName(reader);
@@ -689,23 +736,23 @@ wstring procNODE(xmlTextReaderPtr reader, wstring chunk_type, config cfg)
     if (chunk_type.substr(0, 4) == L"adi-")
     {
       form = verb_generation(lem, pos, suf, cas, mi, head_sem,
-			     flexioned, cfg);
+			     flexioned);
     }
     else if (pos == L"[W]")
     {
       form = date_generation(lem, pos, suf, cas, mi, head_sem, 
-			     flexioned, cfg);
+			     flexioned);
     }
     else if (pos == L"[Z]" || pos == L"[Zu]" || pos == L"[Zm]" 
 	     || pos == L"[Zp]" || pos == L"[Zd]")
     {
       form = number_generation(lem, pos, suf, cas, mi, head_sem, 
-			       flexioned, cfg);
+			       flexioned);
     }
     else
     {
       form = generation(lem, pos, suf, cas, mi, head_sem, 
-			flexioned, cfg);
+			flexioned);
     }
 
     for (size_t i = 0; i<form.size(); i++)
@@ -750,7 +797,7 @@ wstring procNODE(xmlTextReaderPtr reader, wstring chunk_type, config cfg)
 
   while (ret == 1 and tagName == L"NODE" and tagType == XML_READER_TYPE_ELEMENT)
   {
-    nodes += procNODE(reader, chunk_type, cfg);
+    nodes += procNODE(reader, chunk_type);
 
     nextTag(reader);
     tagName = getTagName(reader);
@@ -773,7 +820,7 @@ wstring procNODE(xmlTextReaderPtr reader, wstring chunk_type, config cfg)
 }
 
 
-wstring procCHUNK(xmlTextReaderPtr reader, config cfg)
+wstring procCHUNK(xmlTextReaderPtr reader)
 {
   wstring tagName = getTagName(reader);
   int tagType = xmlTextReaderNodeType(reader);
@@ -795,14 +842,14 @@ wstring procCHUNK(xmlTextReaderPtr reader, config cfg)
   tagName = getTagName(reader);
   tagType = xmlTextReaderNodeType(reader);
 
-  tree += procNODE(reader, type, cfg);
+  tree += procNODE(reader, type);
 
   ret = nextTag(reader);
   tagName = getTagName(reader);
   tagType = xmlTextReaderNodeType(reader);
   while (ret == 1 and tagName == L"CHUNK" and tagType == XML_READER_TYPE_ELEMENT)
   {
-    tree += procCHUNK(reader, cfg);
+    tree += procCHUNK(reader);
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -825,7 +872,7 @@ wstring procCHUNK(xmlTextReaderPtr reader, config cfg)
 }
 
 
-wstring procSENTENCE (xmlTextReaderPtr reader, config cfg)
+wstring procSENTENCE (xmlTextReaderPtr reader)
 {
   wstring tree;
   wstring tagName = getTagName(reader);
@@ -848,7 +895,7 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config cfg)
 
   while (ret == 1 and tagName == L"CHUNK")
   {
-    tree += procCHUNK(reader, cfg);
+    tree += procCHUNK(reader);
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -872,41 +919,54 @@ wstring procSENTENCE (xmlTextReaderPtr reader, config cfg)
 
 int main(int argc, char *argv[])
 {
-  config cfg(argc, argv);
-
   // Set locale information
   locale::global(locale(""));
+
+//      <program name="matxin-gen-morf">
+//        <file name="spa-eus.changes_morph.bin"/>
+//        <file name="eus.morph_preproc.dat"/>
+//        <file name="eus.morph_gen.bin"/>
+//        <file name="eus.measures_gen.bin"/>
+//        <file name="eus.morph_nolex.bin"/>
+//      </program>
+
   
-  // Initialization of the transducer for morphological generation.
-  FILE *transducer = fopen(cfg.Morpho_GenFile.c_str(), "r");
-  fstp_generation.load(transducer);
-  fclose(transducer);
-  fstp_generation.initBiltrans();
+  // Initialisation of the transducer for morphological generation.
 
-  transducer = fopen(cfg.Measures_GenFile.c_str(), "r");
-  fstp_measures.load(transducer);
-  fclose(transducer);
-  fstp_measures.initBiltrans();
-
-  transducer = fopen(cfg.NoLex_GenFile.c_str(), "r");
-  fstp_nolex_generation.load(transducer);
-  fclose(transducer);
-  fstp_nolex_generation.initBiltrans();
-
-  transducer = fopen(cfg.Tag_ToGenFile.c_str(), "r");
+  string tagToGenFile = string(argv[1]);
+  FILE *transducer = fopen(tagToGenFile.c_str(), "r");
   fstp_pre_generation.load(transducer);
   fclose(transducer);
   fstp_pre_generation.initBiltrans();
 
+  string tagOrderFile = string(argv[2]);
   //ordena definituko duen zerbitzaria hasieratu...
-  init_generation_order(cfg.Tag_OrderFile);
+  init_generation_order(tagOrderFile);
+
+  string morphGenFile = string(argv[3]);
+  transducer = fopen(morphGenFile.c_str(), "r");
+  fstp_generation.load(transducer);
+  fclose(transducer);
+  fstp_generation.initBiltrans();
+
+  string measuresGenFile = string(argv[4]);
+  transducer = fopen(measuresGenFile.c_str(), "r");
+  fstp_measures.load(transducer);
+  fclose(transducer);
+  fstp_measures.initBiltrans();
+
+  string noLexGenFile = string(argv[5]);
+  transducer = fopen(noLexGenFile.c_str(), "r");
+  fstp_nolex_generation.load(transducer);
+  fclose(transducer);
+  fstp_nolex_generation.initBiltrans();
 
   //cerr << "Fitxategi guztiak irekita." << endl;
 
   while (true)
   {
     // redirect io
-    Fd0WcoutRedirectHandler ioredirect(cfg);
+//    Fd0WcoutRedirectHandler ioredirect(cfg);
     xmlTextReaderPtr reader;
     reader = xmlReaderForFd(0,"", NULL, 0);
   
@@ -935,17 +995,18 @@ int main(int argc, char *argv[])
     while (ret == 1 and tagName == L"SENTENCE")
     {
       //SENTENCE irakurri eta prozesatzen du.
-      wstring tree = procSENTENCE(reader, cfg);
+      wstring tree = procSENTENCE(reader);
       wcout << tree << endl;
       wcout.flush();
   
-      if (cfg.DoTrace)
+      //if (cfg.DoTrace)
+      if (false)
       {
         ostringstream log_fileName_osoa;
         wofstream log_file;
   
 	log_fileName_osoa.imbue(std::locale("C"));
-        log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
+        //log_fileName_osoa << cfg.Trace_File << i++ << ".xml";
   
         log_file.open(log_fileName_osoa.str().c_str(), ofstream::out | ofstream::app);
 	log_file << L"<!-- Morphological generation (final tree) -->" << endl;
@@ -970,7 +1031,8 @@ int main(int argc, char *argv[])
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }
-    if (!ioredirect.serverOK())
-      break;
+//    if (!ioredirect.serverOK()) {
+//      break;
+//    }
   }
 }
