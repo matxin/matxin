@@ -109,6 +109,7 @@ translate_htmlnoent ()
 PATH="${MATXIN_PATH}:${PATH}"
 [[ -z $TMPDIR ]] && TMPDIR=/tmp
 TMCOMPFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
+TMPFORMATFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
 trap 'rm -Rf "$TMCOMPFILE"' EXIT
 
 # Default values, may be overridden below:
@@ -279,7 +280,7 @@ set -e -o pipefail
 if [ "$FORMAT" = "none" ]; then
     cat "$INFILE"
 else
-  "$MATXIN_PATH/matxin-des$FORMAT" ${FORMAT_OPTIONS} "$INFILE"
+  "$MATXIN_PATH/matxin-des$FORMAT" ${FORMAT_OPTIONS} "$TMPFORMATFILE" "$INFILE"
 fi | if [ "$TRANSLATION_MEMORY_FILE" = "" ];
      then
          cat
@@ -297,7 +298,7 @@ fi | if [ "$TRANSLATION_MEMORY_FILE" = "" ];
                    fi
                else
                  if [ "$REDIR" = "" ]; then
-                     "$MATXIN_PATH/matxin-reformat"
+                     "$MATXIN_PATH/matxin-reformat $TMPFORMATFILE"
                  else
                    "$MATXIN_PATH/matxin-reformat" > "$SALIDA"
                  fi
