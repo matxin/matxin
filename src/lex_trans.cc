@@ -55,7 +55,7 @@ wstring upper_type(wstring form, wstring mi, wstring ord)
   while (form_begin != form.size())
   {
     if (tolower(form[form_begin]) != form[form_begin] and
-        (ord != L"1" or mi.substr(0, 2) == L"NP"))
+        (ord != L"1" or mi.substr(0, 2) == L"NP"))             // FIXME: ETIKETA
     {
       if (form_begin == 0)
         case_type = L"first";
@@ -216,12 +216,12 @@ vector<wstring> get_translation(wstring lem, wstring mi,
 {
   vector<wstring> translation;
 
-  wstring input = L"^" + lem + L"<parol>" + mi + L"$";
+  wstring input = L"^" + lem + L"<parol>" + mi + L"$";  // FIXME: ETIKETA
   wstring trad = fstp.biltrans(input);
   trad = trad.substr(1, trad.size() - 2);
 
   unknown = false;
-  if (trad[0] == L'@' || trad.find(L">") < trad.find(L"<"))
+  if (trad[0] == L'@' || trad.find(L">") < trad.find(L"<"))  // FIXME: ETIKETA
   {
     //if (mi.substr(0,2) != L"NP") {
       input = L"^" + lem + L"<parol>noKAT_" + mi.substr(0,2) + L"$";
@@ -308,6 +308,7 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
                                                      attrib(reader, "ord"))) +
                  L"'";
 
+    // FIXME: ETIKETA
     if (attrib(reader, "mi").substr(0,1) == L"W" or
         attrib(reader, "mi").substr(0,1) == L"Z")
     {
@@ -336,6 +337,7 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
       attributes += L" " + select[0];
 
       // Hitz horren semantika begiratzen da
+      // FIXME: ETIKETA
       if (head && text_attrib(select[0], L"pos") == L"[IZE][ARR]" and
           get_lexInfo(L"nounSem", text_attrib(select[0], L"lem")) != L"" )
         attributes += L" sem='" + write_xml(get_lexInfo(L"nounSem",
@@ -343,9 +345,10 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
                                                                     L"lem"))) +
                       L"'";
 
-      if (unknown)
+      if (unknown) 
+      {
         attributes += L" unknown='transfer'";
-
+      }
       head_child = head && (text_attrib(select[0], L"lem") == L"");
     }
 
@@ -716,7 +719,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      wcerr << L"ERROR: invalid document: found <" << tagName
+      wcerr << L"[0]ERROR: invalid document: found <" << tagName
             << L"> when <corpus> was expected..." << endl;
       exit(-1);
     }
@@ -760,10 +763,11 @@ int main(int argc, char *argv[])
        tagType == XML_READER_TYPE_END_ELEMENT)
     {
       wcout << L"</corpus>\n";
+      break ;
     }
     else
     {
-      wcerr << L"ERROR: invalid document: found <" << tagName
+      wcerr << L"[1]ERROR: invalid document: found <" << tagName
             << L"> when </corpus> was expected..." << endl;
       exit(-1);
     }

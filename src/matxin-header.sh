@@ -25,7 +25,6 @@ message ()
   echo " -a               display ambiguity"
   echo " -u               don't display marks '*' for unknown words"
   echo " -n               don't insert period before possible sentence-ends"
-  echo " -m memory.tmx    use a translation memory to recycle translations"
   echo " -o direction     translation direction using the translation memory,"
   echo "                  by default 'direction' is used instead"
   echo " -l               lists the available translation directions and exits"
@@ -82,276 +81,6 @@ test_gawk ()
   fi
 }
 
-
-translate_latex()
-{
-  test_gawk
-
-  if [ "$INFILE" = ""  -o "$INFILE" = /dev/stdin ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-
-  if [ "$(file -b --mime-encoding "$INFILE")" == "utf-8" ]; then
-    locale_latin1
-  else locale_utf8
-  fi
-
-  "$MATXIN_PATH/matxin-prelatex" "$INFILE" | \
-    "$MATXIN_PATH/matxin-utils-fixlatex" | \
-    "$MATXIN_PATH/matxin-deslatex" ${FORMAT_OPTIONS} | \
-    if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-    then cat;
-    else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-    fi | \
-      if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-      sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-    else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-    fi | \
-      "$MATXIN_PATH/matxin-relatex"| \
-      awk '{gsub("</CONTENTS-noeos>", "</CONTENTS>"); print;}' | \
-      if [ "$REDIR" == "" ]; then "$MATXIN_PATH/matxin-postlatex-raw"; else "$MATXIN_PATH/matxin-postlatex-raw" > "$SALIDA"; fi
-
-    if [ "$BORRAFICHERO" = "true" ]; then
-      rm -Rf "$INFILE"
-    fi
-}
-
-
-translate_latex_raw()
-{
-  test_gawk
-
-  if [ "$INFILE" = "" -o "$INFILE" = /dev/stdin ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-
-  if [ "$(file -b --mime-encoding "$INFILE")" = "utf-8" ]; then
-    locale_latin1
-  else locale_utf8
-  fi
-
-  "$MATXIN_PATH/matxin-prelatex" "$INFILE" | \
-    "$MATXIN_PATH/matxin-utils-fixlatex" | \
-    "$MATXIN_PATH/matxin-deslatex" ${FORMAT_OPTIONS} | \
-    if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-    then cat;
-    else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-    fi | \
-      if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-      sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-    else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-    fi | \
-      "$MATXIN_PATH/matxin-relatex"| \
-      awk '{gsub("</CONTENTS-noeos>", "</CONTENTS>"); print;}' | \
-      if [ "$REDIR" == "" ]; then "$MATXIN_PATH/matxin-postlatex-raw"; else "$MATXIN_PATH/matxin-postlatex-raw" > "$SALIDA"; fi
-}
-
-
-translate_odt ()
-{
-  INPUT_TMPDIR=$(mktemp -d "$TMPDIR/matxin.XXXXXXXX")
-
-  locale_utf8
-  test_zip
-
-  if [ "$INFILE" = "" ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-  OTRASALIDA=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-
-  unzip -q -o -d "$INPUT_TMPDIR" "$INFILE"
-  find "$INPUT_TMPDIR" | grep "content\\.xml\\|styles\\.xml" |\
-  awk '{printf "<file name=\"" $0 "\"/>"; PART = $0; while(getline < PART) printf(" %s", $0); printf("\n");}' |\
-  "$MATXIN_PATH/matxin-desodt" ${FORMAT_OPTIONS} |\
-  if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-  then cat;
-  else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-  fi | \
-    if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-    sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  fi | \
-    "$MATXIN_PATH/matxin-reodt"|\
-  awk '{punto = index($0, "/>") + 3; cabeza = substr($0, 1, punto-1); cola = substr($0, punto); n1 = substr(cabeza, index(cabeza, "\"")+1); name = substr(n1, 1, index(n1, "\"")-1); gsub("[?]> ", "?>\n", cola); print cola > name;}'
-  VUELVE=$(pwd)
-  cd "$INPUT_TMPDIR"
-  rm -Rf ObjectReplacements
-  zip -q -r - . >"$OTRASALIDA"
-  cd "$VUELVE"
-  rm -Rf "$INPUT_TMPDIR"
-
-  if [ "$BORRAFICHERO" = "true" ]; then
-    rm -Rf "$INFILE";
-  fi
-
-  if [ "$REDIR" == "" ]; then cat "$OTRASALIDA"; else cat "$OTRASALIDA" > "$SALIDA"; fi
-  rm -Rf "$OTRASALIDA"
-  rm -Rf "$TMCOMPFILE"
-}
-
-translate_docx ()
-{
-  INPUT_TMPDIR=$(mktemp -d "$TMPDIR/matxin.XXXXXXXX")
-
-  locale_utf8
-  test_zip
-
-  if [ "$INFILE" = "" ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-  OTRASALIDA=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-
-  if [ "$UWORDS" = "no" ]; then
-    OPCIONU="-u";
-  else OPCIONU="";
-  fi
-
-  unzip -q -o -d "$INPUT_TMPDIR" "$INFILE"
-
-  for i in $(find "$INPUT_TMPDIR"|grep "xlsx$");
-  do LOCALTEMP=$(mktemp "$TMPDIR/matxin.XXXXXXXX");
-    "$MATXIN_PATH/matxin" -f xlsx -d "$DATADIR" "$OPCIONU" "$PAIR" <"$i" >"$LOCALTEMP";
-    cp "$LOCALTEMP" "$i";
-    rm "$LOCALTEMP";
-  done;
-
-  find "$INPUT_TMPDIR" | grep "xml" |\
-  grep -v -i \\\(settings\\\|theme\\\|styles\\\|font\\\|rels\\\|docProps\\\) |\
-  awk '{printf "<file name=\"" $0 "\"/>"; PART = $0; while(getline < PART) printf(" %s", $0); printf("\n");}' |\
-  "$MATXIN_PATH/matxin-deswxml" ${FORMAT_OPTIONS} |\
-  if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-  then cat;
-  else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-  fi | \
-    if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-    sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  fi | \
-    "$MATXIN_PATH/matxin-rewxml"|\
-  awk '{punto = index($0, "/>") + 3; cabeza = substr($0, 1, punto-1); cola = substr($0, punto); n1 = substr(cabeza, index(cabeza, "\"")+1); name = substr(n1, 1, index(n1, "\"")-1); gsub("[?]> ", "?>\n", cola); print cola > name;}'
-  VUELVE=$(pwd)
-  cd "$INPUT_TMPDIR"
-  zip -q -r - . >"$OTRASALIDA"
-  cd "$VUELVE"
-  rm -Rf "$INPUT_TMPDIR"
-
-  if [ "$BORRAFICHERO" = "true" ]; then
-    rm -Rf "$INFILE";
-  fi
-
-  if [ "$REDIR" == "" ]; then cat "$OTRASALIDA"; else cat "$OTRASALIDA" > "$SALIDA"; fi
-  rm -Rf "$OTRASALIDA"
-  rm -Rf "$TMCOMPFILE"
-}
-
-translate_pptx ()
-{
-  INPUT_TMPDIR=$(mktemp -d "$TMPDIR/matxin.XXXXXXXX")
-
-  locale_utf8
-  test_zip
-
-  if [ "$INFILE" = "" ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-  OTRASALIDA=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-
-  if [ "$UWORDS" = "no" ]; then
-    OPCIONU="-u";
-  else OPCIONU="";
-  fi
-
-  unzip -q -o -d "$INPUT_TMPDIR" "$INFILE"
-
-  for i in $(find "$INPUT_TMPDIR"|grep "xlsx$"); do
-    LOCALTEMP=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    "$MATXIN_PATH/matxin" -f xlsx -d "$DATADIR" "$OPCIONU" "$PAIR" <"$i" >"$LOCALTEMP";
-    cp "$LOCALTEMP" "$i"
-    rm "$LOCALTEMP"
-  done;
-
-  find "$INPUT_TMPDIR" | grep "xml$" |\
-  grep "slides\/slide" |\
-  awk '{printf "<file name=\"" $0 "\"/>"; PART = $0; while(getline < PART) printf(" %s", $0); printf("\n");}' |\
-  "$MATXIN_PATH/matxin-despptx" ${FORMAT_OPTIONS} |\
-  if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-  then cat;
-  else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-  fi | \
-    if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-    sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  fi | \
-    "$MATXIN_PATH/matxin-repptx" |\
-  awk '{punto = index($0, "/>") + 3; cabeza = substr($0, 1, punto-1); cola = substr($0, punto); n1 = substr(cabeza, index(cabeza, "\"")+1); name = substr(n1, 1, index(n1, "\"")-1); gsub("[?]> ", "?>\n", cola); print cola > name;}'
-  VUELVE=$(pwd)
-  cd "$INPUT_TMPDIR"
-  zip -q -r - . >"$OTRASALIDA"
-  cd "$VUELVE"
-  rm -Rf "$INPUT_TMPDIR"
-
-  if [ "$BORRAFICHERO" = "true" ]; then
-    rm -Rf "$INFILE";
-  fi
-
-  if [ "$REDIR" == "" ]; then cat "$OTRASALIDA"; else cat "$OTRASALIDA" > "$SALIDA"; fi
-  rm -Rf "$OTRASALIDA"
-  rm -Rf "$TMCOMPFILE"
-}
-
-
-translate_xlsx ()
-{
-  INPUT_TMPDIR=$(mktemp -d "$TMPDIR/matxin.XXXXXXXX")
-
-  locale_utf8
-  test_zip
-
-  if [ "$INFILE" = "" ]; then
-    INFILE=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-    cat > "$INFILE"
-    BORRAFICHERO="true"
-  fi
-  OTRASALIDA=$(mktemp "$TMPDIR/matxin.XXXXXXXX")
-
-  unzip -q -o -d "$INPUT_TMPDIR" "$INFILE"
-  find "$INPUT_TMPDIR" | grep "sharedStrings.xml" |\
-  awk '{printf "<file name=\"" $0 "\"/>"; PART = $0; while(getline < PART) printf(" %s", $0); printf("\n");}' |\
-  "$MATXIN_PATH/matxin-desxlsx" ${FORMAT_OPTIONS} |\
-  if [ "$TRANSLATION_MEMORY_FILE" = "" ];
-  then cat;
-  else "$MATXIN_PATH/lt-tmxproc" "$TMCOMPFILE";
-  fi | \
-    if [ ! -x "$DATADIR/modes/$PAIR.mode" ]; then
-    sh "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  else "$DATADIR/modes/$PAIR.mode" "$OPTION" "$OPTION_TAGGER"
-  fi | \
-    "$MATXIN_PATH/matxin-rexlsx" |\
-  awk '{punto = index($0, "/>") + 3; cabeza = substr($0, 1, punto-1); cola = substr($0, punto); n1 = substr(cabeza, index(cabeza, "\"")+1); name = substr(n1, 1, index(n1, "\"")-1); gsub("[?]> ", "?>\n", cola); print cola > name;}'
-  VUELVE=$(pwd)
-  cd "$INPUT_TMPDIR"
-  zip -q -r - . >"$OTRASALIDA"
-  cd "$VUELVE"
-  rm -Rf "$INPUT_TMPDIR"
-
-  if [ "$BORRAFICHERO" = "true" ]; then
-    rm -Rf "$INFILE";
-  fi
-
-  if [ "$REDIR" == "" ]; then cat "$OTRASALIDA"; else cat "$OTRASALIDA" > "$SALIDA"; fi
-  rm -Rf "$OTRASALIDA"
-  rm -Rf "$TMCOMPFILE"
-}
 
 translate_htmlnoent ()
 {
@@ -505,50 +234,6 @@ case "$FORMAT" in
     export LC_CTYPE=$MILOCALE
     ;;
 
-  odt)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_odt
-    exit 0
-    ;;
-  latex)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_latex
-    exit 0
-    ;;
-  latex-raw)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_latex_raw
-    exit 0
-    ;;
-  
-  
-  docx)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_docx
-    exit 0
-    ;;
-  xlsx)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_xlsx
-    exit 0
-    ;;
-  pptx)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    translate_pptx
-    exit 0
-    ;;
   html-noent)
     if [ "$UWORDS" = "no" ]; then OPTION="-n";
     else OPTION="-g";
@@ -557,23 +242,12 @@ case "$FORMAT" in
     exit 0
     ;;
   
-  wxml)
-    if [ "$UWORDS" = "no" ]; then OPTION="-n";
-    else OPTION="-g";
-    fi;
-    locale_utf8
-    ;;
-  
   txtu)
     FORMAT="txt";
     OPTION="-n"
     ;;
   htmlu)
     FORMAT="html";
-    OPTION="-n";
-    ;;
-  xpresstagu)
-    FORMAT="xpresstag";
     OPTION="-n";
     ;;
   rtfu)
@@ -585,35 +259,6 @@ case "$FORMAT" in
       exit 1;
     fi
     export LC_CTYPE=$MILOCALE
-    ;;
-
-  odtu)
-    OPTION="-n"
-    translate_odt
-    exit 0
-    ;;
-
-  docxu)
-    OPTION="-n"
-    translate_docx
-    exit 0
-    ;;
-
-  xlsxu)
-    OPTION="-n"
-    translate_xlsx
-    exit 0
-    ;;
-
-  pptxu)
-    OPTION="-n"
-    translate_pptx
-    exit 0
-    ;;
-
-  wxmlu)
-    OPTION="-n";
-    locale_utf8
     ;;
 
 

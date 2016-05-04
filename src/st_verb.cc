@@ -609,6 +609,7 @@ int main(int argc, char *argv[])
     if (ret == 1 and tagName == L"corpus" and tagType == XML_READER_TYPE_END_ELEMENT)
     {
       wcout << L"</corpus>\n";
+      break;
     }
     else
     {
