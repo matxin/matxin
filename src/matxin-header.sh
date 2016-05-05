@@ -298,9 +298,10 @@ fi | if [ "$TRANSLATION_MEMORY_FILE" = "" ];
                    fi
                else
                  if [ "$REDIR" = "" ]; then
-                     "$MATXIN_PATH/matxin-reformat $TMPFORMATFILE"
+                     "$MATXIN_PATH/matxin-reformat" "$TMPFORMATFILE"
                  else
-                   "$MATXIN_PATH/matxin-reformat" > "$SALIDA"
+                   "$MATXIN_PATH/matxin-reformat" "$TMPFORMATFILE" > "$SALIDA"
                  fi
                fi
 
+rm $TMPFORMATFILE
