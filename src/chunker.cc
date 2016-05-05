@@ -128,7 +128,7 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
 
   if (tagName == L"SENTENCE" and tagType != XML_READER_TYPE_END_ELEMENT)
   {
-    tree = L"<SENTENCE ref='" + write_xml(allAttrib(reader)) + L">\n";
+    tree = L"<SENTENCE " + write_xml(allAttrib(reader)) + L">\n";
   }
   else
   {
