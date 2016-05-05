@@ -36,14 +36,16 @@ using namespace std;
 
 bool doTrace = false;
 
-wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs)
+wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk)
 {
-  wstring nodes;
+  wstring nodes, subnodes;
   wstring chunk_open=L"";
   wstring chunk_close=L"";
   wstring attribs;
   wstring tagName = getTagName(reader);
   int tagType = xmlTextReaderNodeType(reader);
+
+  chunk = false;
 
   if (tagName == L"NODE" and tagType != XML_READER_TYPE_END_ELEMENT)
   {
@@ -54,6 +56,7 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs)
     wstring chunktype = get_FromCondDict(attribs, parent_attribs);
     if (chunktype != L"-")
     {
+      chunk = true;
       wstring ord = attrib(reader, "ord");
       wstring si = attrib(reader, "si");
       wstring alloc = attrib(reader, "alloc");
@@ -91,8 +94,16 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs)
   while (ret == 1 and tagName == L"NODE" and
          tagType == XML_READER_TYPE_ELEMENT)
   {
-    wstring child = procNODE(reader, attribs);
-    nodes += child;
+    bool isChunk;
+    wstring child = procNODE(reader, attribs, isChunk);
+    if (isChunk)
+    {
+      subnodes += child;
+    }
+    else
+    {
+      nodes += child;
+    }
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -111,7 +122,7 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs)
     exit(-1);
   }
 
-  nodes = chunk_open + nodes + chunk_close;
+  nodes = chunk_open + nodes + subnodes + chunk_close;
   return nodes;
 }
 
@@ -140,7 +151,8 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
   while (ret == 1 and tagName == L"NODE")
   {
     // NODEa irakurri eta prozesatzen du.
-    tree += procNODE(reader, L"");
+    bool isChunk;
+    tree += procNODE(reader, L"", isChunk);
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
