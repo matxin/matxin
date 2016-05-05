@@ -894,7 +894,12 @@ void init_chunk_order(string fitxName)
       }
     }
     if (lerro[lerro.size()-1] == L' ' or lerro[lerro.size()-1] == L'\t')
-      lerro.erase(lerro.size()-1,1);
+    {
+      if(lerro.size() != 0) 
+      {
+        lerro.erase(lerro.size()-1,1);
+      }
+    }
 
     size_t sep1 = lerro.find(L"\t");
     size_t sep2 = lerro.find(L"\t", sep1 + 1);
