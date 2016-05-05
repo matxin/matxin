@@ -36,11 +36,6 @@ using namespace std;
 
 bool doTrace = false;
 
-wstring get_chunkType(wstring parent, wstring child) {
-
-  return L"UNK";
-}
-
 wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs)
 {
   wstring nodes;
