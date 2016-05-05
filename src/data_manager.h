@@ -46,6 +46,9 @@ struct movement {
   wstring write_type;
 };
 
+void init_condDict(string fitxName);
+wstring get_FromCondDict(wstring attributes, wstring parent_attributes);
+
 void init_chunkMovement(string fitxName);
 vector<movement> get_chunk_movements(wstring fromAttributes, wstring toAttributes, wstring direction);
 

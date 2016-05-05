@@ -554,6 +554,52 @@ bool apply_condition(wstring condition, wstring attributes, wstring parent_attri
 // }
 
 
+struct CondDictEntry {
+  wstring condition;
+  wstring value;
+};
+
+static struct conditined_dict
+{
+  bool isInit;
+  vector<CondDictEntry> entries;
+} condDictionary;
+
+void init_condDict(string fitxName)
+{
+  wifstream fitx;
+  fitx.open(fitxName.c_str());
+
+  wstring lerro;
+  while (getline(fitx, lerro))
+  {
+    size_t sep1 = lerro.find(L'\t');
+    if (sep1 == wstring::npos)
+      continue;
+
+    CondDictEntry current;
+    current.value = lerro.substr(0, sep1);
+    current.condition = lerro.substr(sep1 + 1);
+
+    condDictionary.entries.push_back(current);
+  }
+
+  fitx.close();
+  condDictionary.isInit = true;
+}
+
+wstring get_FromCondDict(wstring attributes, wstring parent_attributes=L"") {
+  for (size_t i = 0; i < condDictionary.entries.size(); i++)
+  {
+    CondDictEntry entry = condDictionary.entries[i];
+    if (apply_condition(entry.condition, attributes, parent_attributes)) {
+      return entry.value;
+    }
+  }
+
+  return L"";
+}
+
 static struct chunkMovements
 {
   bool isInit;

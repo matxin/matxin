@@ -4,7 +4,7 @@ matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
 
 matxindir = $(prefix)/share/matxin
 
-bin_PROGRAMS = matxin-xfer-lex matxin-xfer-intra matxin-xfer-inter matxin-xfer-adpos \
+bin_PROGRAMS = matxin-analysis-chunk matxin-xfer-lex matxin-xfer-intra matxin-xfer-inter matxin-xfer-adpos \
 	       matxin-xfer-verb matxin-gen-inter matxin-gen-intra matxin-gen-move \
 	       matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki matxin-deshtml matxin-desrtf
 
@@ -12,6 +12,9 @@ bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-vali
 
 #matxin_analyser_SOURCES = analyser.cc io_redirect_handler.cc io_redirect_handler.hpp
 #matxin_analyser_LDADD = -lfreeling -lboost_system -lboost_program_options
+
+matxin_analysis_chunk_SOURCES = chunker.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_analysis_chunk_LDADD = -lfreeling -lboost_system -lboost_program_options
 
 matxin_xfer_lex_SOURCES = lex_trans.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
 matxin_xfer_lex_LDADD = -lfoma -lboost_system -lboost_program_options
