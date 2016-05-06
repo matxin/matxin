@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.59)
 AC_INIT([matxin], [1.4.0-beta])
-AC_CONFIG_SRCDIR([src/analyser.cc])
+# AC_CONFIG_SRCDIR([src/analyser.cc])
 AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE=matxin
 
