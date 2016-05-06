@@ -36,7 +36,7 @@ using namespace std;
 
 bool doTrace = false;
 
-wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk)
+wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk, wstring &subchunk)
 {
   wstring nodes, subnodes;
   wstring chunk_open=L"";
@@ -95,7 +95,8 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk)
          tagType == XML_READER_TYPE_ELEMENT)
   {
     bool isChunk;
-    wstring child = procNODE(reader, attribs, isChunk);
+    wstring subChunks = L"";
+    wstring child = procNODE(reader, attribs, isChunk, subChunks);
     if (isChunk)
     {
       subnodes += child;
@@ -103,6 +104,7 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk)
     else
     {
       nodes += child;
+      subnodes += subChunks;
     }
 
     ret = nextTag(reader);
@@ -122,7 +124,17 @@ wstring procNODE(xmlTextReaderPtr reader, wstring parent_attribs, bool &chunk)
     exit(-1);
   }
 
-  nodes = chunk_open + nodes + subnodes + chunk_close;
+  if (chunk)
+  {
+    chunk_close = subnodes + chunk_close;
+    subnodes = L"";
+  }
+  else
+  {
+    subchunk = subnodes;
+  }
+
+  nodes = chunk_open + nodes + chunk_close;
   return nodes;
 }
 
@@ -152,7 +164,17 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
   {
     // NODEa irakurri eta prozesatzen du.
     bool isChunk;
-    tree += procNODE(reader, L"", isChunk);
+    wstring subchunk = L"";
+    wstring child = procNODE(reader, L"", isChunk, subchunk);
+
+    if (isChunk)
+    {
+      tree += child;
+    }
+    else
+    {
+      wcerr << L"ERROR: Invalid chunking; root elements have to be be a chunk itself. Please rewrite chunking rules accordingly." << endl;
+    }
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
