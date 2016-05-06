@@ -22,8 +22,8 @@
 #include <sstream>
 #include <locale>
 
-#include "config.h"
-#include "io_redirect_handler.h"
+//#include "config.h"
+//#include "io_redirect_handler.h"
 
 
 #include <data_manager.h>

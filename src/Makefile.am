@@ -1,4 +1,4 @@
-EXTRA_DIST = config.h data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml
+EXTRA_DIST = data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml
 
 matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
 
@@ -10,40 +10,37 @@ bin_PROGRAMS = matxin-chunker matxin-xfer-lex matxin-xfer-intra matxin-xfer-inte
 
 bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-validate-modes
 
-#matxin_analyser_SOURCES = analyser.cc io_redirect_handler.cc io_redirect_handler.hpp
-#matxin_analyser_LDADD = -lfreeling -lboost_system -lboost_program_options
-
-matxin_chunker_SOURCES = chunker.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_chunker_SOURCES = chunker.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h #  #io_redirect_handler.cc io_redirect_handler.h
 matxin_chunker_LDADD = -lfreeling -lboost_system -lboost_program_options
 
-matxin_xfer_lex_SOURCES = lex_trans.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_xfer_lex_SOURCES = lex_trans.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_lex_LDADD = -lfoma -lboost_system -lboost_program_options
 
-matxin_xfer_intra_SOURCES = st_intra.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_xfer_intra_SOURCES = st_intra.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_intra_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_xfer_inter_SOURCES = st_inter.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_xfer_inter_SOURCES = st_inter.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_inter_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_xfer_adpos_SOURCES = st_prep.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_xfer_adpos_SOURCES = st_prep.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_adpos_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_xfer_verb_SOURCES = st_verb.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_xfer_verb_SOURCES = st_verb.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_verb_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_gen_inter_SOURCES = sg_inter.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_gen_inter_SOURCES = sg_inter.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_inter_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_gen_intra_SOURCES = sg_intra.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_gen_intra_SOURCES = sg_intra.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_intra_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_gen_move_SOURCES = sg_move.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_gen_move_SOURCES = sg_move.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_move_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_gen_morf_SOURCES = morph_gen.cc data_manager.cc utf_converter.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_gen_morf_SOURCES = morph_gen.cc data_manager.cc utf_converter.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_morf_LDADD = -lfreeling -lfoma -lboost_system -lboost_program_options
 
-matxin_reformat_SOURCES = reformat.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h io_redirect_handler.cc io_redirect_handler.hpp
+matxin_reformat_SOURCES = reformat.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_reformat_LDADD = -lfoma
 
 matxin_destxt_SOURCES = txt-deformat.cc

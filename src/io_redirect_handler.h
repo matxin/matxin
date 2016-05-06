@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "config.h"
+//#include "config.h"
 
 /*
   If --server given, then

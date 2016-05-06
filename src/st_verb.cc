@@ -23,9 +23,9 @@
 #include <sstream>
 #include <locale>
 
-#include "config.h"
+//#include "config.h"
 #include "matxin_string_utils.h"
-#include "io_redirect_handler.h"
+//#include "io_redirect_handler.h"
 
 #include <xml_reader.h>
 #include <data_manager.h>

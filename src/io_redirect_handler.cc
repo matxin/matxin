@@ -1,4 +1,4 @@
-#include "io_redirect_handler.h"
+//#include "io_redirect_handler.h"
 
 CppIORedirectHandler::CppIORedirectHandler(const config &cfg):cin_buffer(NULL), cout_buffer(NULL), ifs(NULL), ofs(NULL), ok(cfg.server)
 {

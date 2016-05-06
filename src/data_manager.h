@@ -24,7 +24,7 @@
 #include <vector>
 #include <string>
 
-#include "config.h"
+////#include "config.h"
 
 #include "simpleregex.h"
 #include "xml_reader.h"

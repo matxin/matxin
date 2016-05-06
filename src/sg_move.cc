@@ -22,8 +22,8 @@
 #include <iostream>
 #include <locale>
 
-#include "config.h"
-#include "io_redirect_handler.h"
+//#include "config.h"
+//#include "io_redirect_handler.h"
 
 
 #include <xml_reader.h>
