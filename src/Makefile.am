@@ -11,7 +11,7 @@ bin_PROGRAMS = matxin-chunker matxin-xfer-lex matxin-xfer-intra matxin-xfer-inte
 bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-validate-modes
 
 matxin_chunker_SOURCES = chunker.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h #  #io_redirect_handler.cc io_redirect_handler.h
-matxin_chunker_LDADD =  -lboost_system -lboost_program_options
+matxin_chunker_LDADD = -lfoma  -lboost_system -lboost_program_options
 
 matxin_xfer_lex_SOURCES = lex_trans.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_xfer_lex_LDADD = -lfoma -lboost_system -lboost_program_options
