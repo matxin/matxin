@@ -30,6 +30,7 @@
 
 using namespace std;
 
+bool usingChangesSint = false;
 
 wstring writeNODE(vector<wstring> &subTree, wstring &order)
 {
@@ -124,15 +125,19 @@ wstring procNODE(xmlTextReaderPtr reader, vector<wstring> &tree, bool head)
     wstring lemma = attrib(reader, "lem");
     wstring pos = attrib(reader, "pos");
     lemma = lemma + pos;
-    if (get_lexInfo(L"orderPos", lemma) != L"")
+    if (usingChangesSint and get_lexInfo(L"orderPos", lemma) != L"")
     {
       pos = get_lexInfo(L"orderPos", lemma).substr(get_lexInfo(L"orderPos", lemma).find(L"["),
                                                    get_lexInfo(L"orderPos", lemma).size());
     }
     if (head)
+    {
       pattern = L"([BURUA])";
+    }
     else
+    {
       pattern = L"(" + pos + L")";
+    }
 
     attributes = write_xml(allAttrib(reader));
 
@@ -317,9 +322,14 @@ int main(int argc, char *argv[])
 
   //ordena definitu ahal izateko kategoria (DET-en azpikategoria) aldaketen biltegia hasieratu...
   string nodeOrderFile = string(argv[1]);
-  string posToOrderFile = string(argv[2]);
 
-  init_lexInfo(L"orderPos", posToOrderFile);
+  if(argc > 2) 
+  {
+    string posToOrderFile = string(argv[2]);
+    init_lexInfo(L"orderPos", posToOrderFile);
+    usingChangesSint = true;
+  }
+
   init_node_order(nodeOrderFile);
 
   while (true)
