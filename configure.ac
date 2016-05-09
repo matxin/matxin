@@ -2,18 +2,16 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([matxin], [1.4.0-beta])
-# AC_CONFIG_SRCDIR([src/analyser.cc])
+AC_INIT([matxin], [2.0])
 AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE=matxin
 
-GENERIC_MAJOR_VERSION=1
-GENERIC_MINOR_VERSION=4
+GENERIC_MAJOR_VERSION=2
+GENERIC_MINOR_VERSION=0
 GENERIC_MICRO_VERSION=0
-GENERIC_EXTRA_VERSION=beta
 
 GENERIC_RELEASE=$GENERIC_MAJOR_VERSION.$GENERIC_MINOR_VERSION
-GENERIC_RELEASE=$GENERIC_MAJOR_VERSION.$GENERIC_MINOR_VERSION.$GENERIC_MICRO_VERSION-$GENERIC_EXTRA_VERSION
+GENERIC_RELEASE=$GENERIC_MAJOR_VERSION.$GENERIC_MINOR_VERSION.$GENERIC_MICRO_VERSION
 AC_SUBST(GENERIC_RELEASE)
 AC_SUBST(GENERIC_VERSION)
 
@@ -30,6 +28,7 @@ AC_SUBST(GENERIC_LIBRARY_NAME, $PACKAGE)
 #
 m4_define([required_lttoolbox_version], [3.2.0])
 m4_define([required_libxml_version], [2.6.17])
+m4_define([required_libxslt_version], [1.1.28])
 m4_define([required_libpcre_version], [6.4])
 
 #
@@ -323,6 +322,7 @@ AC_CHECK_LIB(foma, main, [true],AC_MSG_ERROR([foma found]))
 PKG_CHECK_MODULES(MATXIN, [dnl
  lttoolbox >= required_lttoolbox_version dnl
  libxml-2.0 >= required_libxml_version dnl
+ libxslt >= required_libxslt_version dnl
  libpcre >= required_libpcre_version], CPPFLAGS="$CPPFLAGS $MATXIN_CPPFLAGS $MATXIN_CFLAGS"; LIBS="$LIBS $MATXIN_LIBS")
 
 #
