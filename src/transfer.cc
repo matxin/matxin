@@ -52,7 +52,27 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
-  string transferFile = string(argv[1]);
+  struct rule_record {
+    int id; 
+    int linia;   // 
+    double pisu; // el peso
+    int rlen;
+  };
+
+  FILE *rin = fopen(argv[1], "rb");
+
+  while(!feof(rin))
+  {
+    rule_record line; 
+    fread(&line, sizeof(rule_record), 1, rin);
+
+    fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
+  }
+
+
+  
+
+/*
   vector<xmlDocPtr> cascade; 
 
   xmlDocPtr doc, res = NULL;
@@ -72,5 +92,6 @@ int main(int argc, char *argv[])
 
   xsltCleanupGlobals();
   xmlCleanupParser();
+*/
 }
 

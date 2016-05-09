@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     rule_record line = {
          i, 
          xmlGetLineNo(cur), 
-         0.0, 
+         1.0, 
          0
     };
     wcout << L"<" << towstring(cur->name);
