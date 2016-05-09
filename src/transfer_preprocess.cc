@@ -50,7 +50,7 @@ void procAttr(xmlNodePtr p, string &res)
     while(attr)
     {
       xmlChar* value = xmlNodeListGetString(p->doc, attr->children, 1);
-      wcout << (char *)attr->name << L"=\"" << (char *)value << L"\"";
+      wcout << towstring(attr->name) << L"=\"" << towstring(value) << L"\"";
       xmlFree(value); 
       if(attr->next)
       {
@@ -70,19 +70,19 @@ void procNode(xmlNodePtr p, string &res)
 
       if(p->type == 1)
       {
-        wcout << L"<" << (char *)p->name;
+        wcout << L"<" << towstring(p->name);
         procAttr(p, res);
       }
       else if(p->type == 3)
       {
-        wcout << (char *)p->content;
+        wcout << towstring(p->content);
       }
 
       if(p->xmlChildrenNode)
       {
         wcout << L">";
         procNode(p->xmlChildrenNode, res);
-        wcout << L"</" << (char *)p->name << L">";
+        wcout << L"</" << towstring(p->name) << L">";
       }
       else if(p->type == 1)
       {
@@ -101,7 +101,7 @@ void procNode(xmlNodePtr p, string &res)
 
 void usage(char *name)
 {
-  wcout << L"" << name << L" <transfer file>" << endl ;
+  wcout << L"" << name << L" <transfer file> <output file>" << endl ;
 }
 
 int main(int argc, char *argv[])
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   // wcout.imbue doesn't have any effect but the in/out streams use the proper encoding.
   locale::global(locale(""));
 
-  if(argc != 2)
+  if(argc != 3)
   {
     usage(argv[0]);
     exit(-1);
@@ -118,13 +118,15 @@ int main(int argc, char *argv[])
 
   string transferFile = string(argv[1]);
 
+  FILE *output = fopen(argv[2], "wb");
+
   vector<string> rules;
 
   xmlDocPtr doc = NULL;
 
-  xmlChar *findRules = xmlCharStrdup("//def-rule") ;
+  xmlChar *findRules = (xmlChar*)"//def-rule" ;
 
-  doc = xmlReadFile(transferFile.c_str(), "utf-8", 0);
+  doc = xmlReadFile(transferFile.c_str(), "", 0);
   xmlSubstituteEntitiesDefault(1);
 
   xmlXPathContextPtr context = xmlXPathNewContext(doc);
@@ -132,26 +134,42 @@ int main(int argc, char *argv[])
   xmlNodeSetPtr nodes = res->nodesetval;
 
   int size = (res->nodesetval) ? nodes->nodeNr : 0;
+
+  struct rule_record {
+    int id; 
+    int linia;   // 
+    double pisu; // el peso
+    int rlen;
+  };
+    string regla;  // la regla
+
  
   xmlNodePtr cur;
   for(int i = 0; i < size; ++i) 
   {
     cur = nodes->nodeTab[i];
-
-    wcerr << L"XXX (" << i << L")" << endl ;
+    
     string res;
-
-    wcout << L"<" << (char *)cur->name;
+    rule_record line = {
+         i, 
+         xmlGetLineNo(cur), 
+         0.0, 
+         0
+    };
+    wcout << L"<" << towstring(cur->name);
     procAttr(cur, res);
     if(cur->xmlChildrenNode) 
     {
       wcout << L">";
       procNode(cur->xmlChildrenNode, res);
+      wcout << L"</" << towstring(cur->name) << L">";
     }
     else
     {
       wcout << L"/>"; 
     }
+
+    fwrite((void *)&line, 1, sizeof(rule_record), output);
 
     cur = cur->next;
   }
@@ -163,5 +181,6 @@ int main(int argc, char *argv[])
 
   xsltCleanupGlobals();
   xmlCleanupParser();
+  fclose(output);
 }
 

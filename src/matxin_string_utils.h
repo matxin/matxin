@@ -20,6 +20,11 @@
 #ifndef MATXIN_STRING_UTILS
 #define MATXIN_STRING_UTILS
 
+#include <libxml/encoding.h>
+#include <libxml/xmlreader.h>
+#include <string>
+#include <cwchar>
+
 #include <wchar.h>
 
 #include <string>
@@ -76,6 +81,11 @@ wstring v2s(vector<wstring> vector, wstring delimiter = L" ");
  *      L"lem='bat' pos='[DET][DZH]' pos='4'"}
  */
 vector<wstring> split_multiattrib(wstring str);
+
+wstring towstring(xmlChar const * input);
+
+wstring stows(string const &str);
+
 
 #ifdef __cplusplus
 }
