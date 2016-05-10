@@ -35,8 +35,7 @@
 
 using namespace std;
 
-
-bool doTrace = false ;
+bool debug = false ;
 
 void usage(char *name)
 {
@@ -76,13 +75,19 @@ int main(int argc, char *argv[])
       break;
     }
 
-    fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
+    if(debug) 
+    {
+      fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
+    }
     
     void *regla = calloc(line.rlen+1, sizeof(wchar_t));
     int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
     wstring wregla = header + wstring((wchar_t *)regla) + footer; 
 
-    wcerr << wregla << endl;
+    if(debug) 
+    {
+      wcerr << wregla << endl;
+    }
 
     xmlDocPtr doc = NULL;
     string rule = wstos(wregla);

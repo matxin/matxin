@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
 //      wcout << L"/>"; 
 //    }
 
-    wcerr << res << endl;
+//    wcerr << res << endl;
     rule_record line = {
          rid, 
          rline, 
