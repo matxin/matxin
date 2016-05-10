@@ -86,6 +86,9 @@ wstring towstring(xmlChar const * input);
 
 wstring stows(string const &str);
 
+string wstos (wstring const &wstr);
+
+
 
 #ifdef __cplusplus
 }

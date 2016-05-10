@@ -157,3 +157,12 @@ stows(string const &str)
 }
 
 
+string 
+wstos (wstring const &wstr)
+{
+  const unsigned wlen = wstr.length();
+  char buf[wlen * sizeof(wstring::value_type) + 1];
+  const ssize_t res = wcstombs(buf, wstr.c_str(), sizeof(buf));
+  return (res >= 0) ? buf : "?";
+}
+

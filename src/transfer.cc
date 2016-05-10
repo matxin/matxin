@@ -21,6 +21,7 @@
 #include <iostream>
 #include <sstream>
 #include <locale>
+#include <clocale>
 
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
@@ -33,6 +34,7 @@
 #include <data_manager.h>
 
 using namespace std;
+
 
 bool doTrace = false ;
 
@@ -62,6 +64,8 @@ int main(int argc, char *argv[])
 
   FILE *rin = fopen(argv[1], "rb");
 
+  vector<xsltStylesheetPtr> cascade; 
+
   while(!feof(rin))
   {
     rule_record line = {0, 0, 0.0, 0} ; 
@@ -76,25 +80,36 @@ int main(int argc, char *argv[])
     
     void *regla = calloc(line.rlen, sizeof(wchar_t));
     int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
-    wcout << header << endl;
-    wstring wregla = wstring((wchar_t *)regla); 
-    wcout << wregla << endl;
-    wcout << footer << endl;
+    wstring wregla = header + wstring((wchar_t *)regla) + footer; 
+
+    xmlDocPtr doc = NULL;
+    string rule = wstos(wregla);
+    doc = xmlReadMemory(rule.c_str(), line.rlen*sizeof(wchar_t), "noname.xml", NULL, 0);
+    xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
+    if(xsls != NULL) 
+    {
+      cascade.push_back(xsls);
+    }
+    else
+    {
+      wcerr << L"Error loading rule " << line.id << endl; 
+    }
   }
 
-
-  
-
-/*
-  vector<xmlDocPtr> cascade; 
-
   xmlDocPtr doc, res = NULL;
-  xsltStylesheetPtr cur = NULL;
-
   doc = xmlReadFd(0, "/", NULL, 0);
 
-  cur = xsltParseStylesheetFile((const xmlChar *)transferFile.c_str());
   xmlSubstituteEntitiesDefault(1);
+  res = doc; 
+  xsltStylesheetPtr last = NULL;
+  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
+  { 
+    wcerr << L"=== applying rule ==========================================================" << endl;
+    res = xsltApplyStylesheet(*it, doc, NULL);
+    
+  }
+  
+/*
 
   res = xsltApplyStylesheet(cur, doc, NULL);
   xsltSaveResultToFile(stdout, res, cur);
