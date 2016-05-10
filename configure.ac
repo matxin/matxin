@@ -28,7 +28,7 @@ AC_SUBST(GENERIC_LIBRARY_NAME, $PACKAGE)
 #
 m4_define([required_lttoolbox_version], [3.2.0])
 m4_define([required_libxml_version], [2.6.17])
-m4_define([required_libxslt_version], [1.1.28])
+m4_define([required_libxslt_version], [1.1.26])
 m4_define([required_libpcre_version], [6.4])
 
 #
