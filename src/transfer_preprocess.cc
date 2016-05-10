@@ -40,55 +40,75 @@ using namespace std;
 bool doTrace = false ;
 int depth = 0;
 
-void procAttr(xmlNodePtr p, string &res)
+void procAttr(xmlNodePtr p, wstring &res)
 {
     xmlAttr* attr = p->properties;
     if(attr) 
     {
-      wcout << L" ";
+      res = res + L" ";
     }
     while(attr)
     {
       xmlChar* value = xmlNodeListGetString(p->doc, attr->children, 1);
-      wcout << towstring(attr->name) << L"=\"" << towstring(value) << L"\"";
+      res = res + towstring(attr->name) + L"=\"" + towstring(value) + L"\"";
       xmlFree(value); 
       if(attr->next)
       {
-        wcout << L" ";
+        res = res + L" ";
       }
       attr = attr->next;
     }
     xmlFree(attr);
 }
 
-void procNode(xmlNodePtr p, string &res) 
+wstring full(wstring &s)
+{
+    if(s == L"attr")
+    { 
+      return L"xsl:attribute";
+    }
+    else if(s == L"elem")
+    { 
+      return L"xsl:element";
+    }
+    else if(s == L"NODE" or s == L"CHUNK")
+    {
+      return s;
+    }
+    else
+    {
+      return L"xsl:" + s;
+    } 
+}
+
+void procNode(xmlNodePtr p, wstring &res) 
 {
     depth = depth + 1;
 
     while(p != NULL) 
     {
-
       if(p->type == 1)
       {
-        wcout << L"<" << towstring(p->name);
+        wstring name = towstring(p->name);
+        res = res + L"<" + full(name); 
         procAttr(p, res);
       }
       else if(p->type == 3)
       {
-        wcout << towstring(p->content);
+        res = res + towstring(p->content);
       }
 
       if(p->xmlChildrenNode)
       {
-        wcout << L">";
+        res = res + L">";
         procNode(p->xmlChildrenNode, res);
-        wcout << L"</" << towstring(p->name) << L">";
+        wstring name = towstring(p->name);
+        res = res + L"</" + full(name) + L">";
       }
       else if(p->type == 1)
       {
-        wcout << L"/>"; 
+        res = res + L"/>";
       }
-  
 
       p = p->next;
     }
@@ -120,8 +140,6 @@ int main(int argc, char *argv[])
 
   FILE *output = fopen(argv[2], "wb");
 
-  vector<string> rules;
-
   xmlDocPtr doc = NULL;
 
   xmlChar *findRules = (xmlChar*)"//def-rule" ;
@@ -141,23 +159,16 @@ int main(int argc, char *argv[])
     double pisu; // el peso
     int rlen;
   };
-    string regla;  // la regla
-
  
   xmlNodePtr cur;
   for(int i = 0; i < size; ++i) 
   {
     cur = nodes->nodeTab[i];
     
-    string res;
-    rule_record line = {
-         i, 
-         xmlGetLineNo(cur), 
-         1.0, 
-         0
-    };
+    wstring res = L"";
+    int rline = xmlGetLineNo(cur);
     wcout << L"<" << towstring(cur->name);
-    procAttr(cur, res);
+    //procAttr(cur, res);
     if(cur->xmlChildrenNode) 
     {
       wcout << L">";
@@ -169,7 +180,20 @@ int main(int argc, char *argv[])
       wcout << L"/>"; 
     }
 
+    wcerr << res << endl;
+
+    rule_record line = {
+         i, 
+         rline, 
+         1.0,                 // default weight
+         wcslen(res.c_str())
+    };
+ 
+    void *regla = calloc(line.rlen, sizeof(wchar_t));
+    regla = (void *)res.c_str();
+
     fwrite((void *)&line, 1, sizeof(rule_record), output);
+    fwrite(regla, sizeof(wchar_t), line.rlen, output);
 
     cur = cur->next;
   }

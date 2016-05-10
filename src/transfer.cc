@@ -65,8 +65,12 @@ int main(int argc, char *argv[])
   {
     rule_record line; 
     fread(&line, sizeof(rule_record), 1, rin);
-
     fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
+    
+    void *regla = calloc(line.rlen, sizeof(wchar_t));
+    int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
+    wcerr << res << endl;
+    fwprintf(stderr, L"%S\n", regla);
   }
 
 
