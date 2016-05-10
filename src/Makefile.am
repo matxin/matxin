@@ -44,6 +44,9 @@ matxin_gen_morf_LDADD =  -lfoma
 matxin_reformat_SOURCES = reformat.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_reformat_LDADD = -lfoma
 
+matxin_generate_SOURCES = generate.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
+matxin_generate_LDADD =  -lfoma  
+
 matxin_transfer_SOURCES = transfer.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_transfer_LDADD =  -lfoma  
 
