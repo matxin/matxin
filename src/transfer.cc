@@ -64,14 +64,21 @@ int main(int argc, char *argv[])
 
   while(!feof(rin))
   {
-    rule_record line; 
+    rule_record line = {0, 0, 0.0, 0} ; 
     fread(&line, sizeof(rule_record), 1, rin);
+ 
+    if(line.rlen == 0)  
+    {
+      break;
+    }
+
     fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
     
     void *regla = calloc(line.rlen, sizeof(wchar_t));
     int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
     wcout << header << endl;
-    wcout << (wchar_t *)regla << endl;
+    wstring wregla = wstring((wchar_t *)regla); 
+    wcout << wregla << endl;
     wcout << footer << endl;
   }
 

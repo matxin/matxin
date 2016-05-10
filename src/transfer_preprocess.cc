@@ -161,27 +161,28 @@ int main(int argc, char *argv[])
   };
  
   xmlNodePtr cur;
-  for(int i = 0; i < size; ++i) 
+  for(int i = 0; i < size; i++) 
   {
     cur = nodes->nodeTab[i];
     
     wstring res = L"";
+    int rid = i + 1;
     int rline = xmlGetLineNo(cur);
-    wcout << L"<" << towstring(cur->name);
-    //procAttr(cur, res);
+
+//    wcout << L"<" << towstring(cur->name);
+//    procAttr(cur, res);
     if(cur->xmlChildrenNode) 
     {
-      wcout << L">";
+      //wcout << L">";
       procNode(cur->xmlChildrenNode, res);
-      wcout << L"</" << towstring(cur->name) << L">";
+      //wcout << L"</" << towstring(cur->name) << L">";
     }
-    else
-    {
-      wcout << L"/>"; 
-    }
+//    else
+//    {
+//      wcout << L"/>"; 
+//    }
 
     wcerr << res << endl;
-    int rid = i + 1;
     rule_record line = {
          rid, 
          rline, 
@@ -189,11 +190,11 @@ int main(int argc, char *argv[])
          wcslen(res.c_str())
     };
  
-    void *regla = calloc(line.rlen + 1, sizeof(wchar_t));
+    void *regla = calloc(line.rlen+1, sizeof(wchar_t));
     regla = (void *)res.c_str();
 
     fwrite((void *)&line, 1, sizeof(rule_record), output);
-    fwrite(regla, sizeof(wchar_t), line.rlen, output);
+    fwrite(regla, sizeof(wchar_t)+1, line.rlen, output);
 
     cur = cur->next;
   }
