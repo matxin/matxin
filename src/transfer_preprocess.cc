@@ -181,15 +181,15 @@ int main(int argc, char *argv[])
     }
 
     wcerr << res << endl;
-
+    int rid = i + 1;
     rule_record line = {
-         i, 
+         rid, 
          rline, 
          1.0,                 // default weight
          wcslen(res.c_str())
     };
  
-    void *regla = calloc(line.rlen, sizeof(wchar_t));
+    void *regla = calloc(line.rlen + 1, sizeof(wchar_t));
     regla = (void *)res.c_str();
 
     fwrite((void *)&line, 1, sizeof(rule_record), output);

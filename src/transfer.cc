@@ -28,6 +28,7 @@
 #include <libxslt/xsltutils.h>
 
 #include "matxin_string_utils.h"
+#include "transfer.h"
 
 #include <data_manager.h>
 
@@ -69,8 +70,9 @@ int main(int argc, char *argv[])
     
     void *regla = calloc(line.rlen, sizeof(wchar_t));
     int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
-    wcerr << res << endl;
-    fwprintf(stderr, L"%S\n", regla);
+    wcout << header << endl;
+    wcout << (wchar_t *)regla << endl;
+    wcout << footer << endl;
   }
 
 
