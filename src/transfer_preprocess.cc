@@ -71,7 +71,7 @@ wstring full(wstring &s)
     { 
       return L"xsl:element";
     }
-    else if(s == L"NODE" or s == L"CHUNK" or s == L"SYN")
+    else if(s == L"NODE" || s == L"CHUNK" || s == L"SYN")
     {
       return s;
     }
