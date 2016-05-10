@@ -6,7 +6,7 @@ matxindir = $(prefix)/share/matxin
 
 bin_PROGRAMS = matxin-chunker matxin-xfer-lex matxin-xfer-intra matxin-xfer-inter matxin-xfer-adpos \
 	       matxin-xfer-verb matxin-gen-inter matxin-gen-intra matxin-gen-move matxin-transfer matxin-preprocess-transfer \
-	       matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki matxin-deshtml matxin-desrtf
+	       matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki matxin-deshtml matxin-desrtf matxin-generate
 
 bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-validate-modes
 
