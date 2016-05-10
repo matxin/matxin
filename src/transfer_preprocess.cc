@@ -153,11 +153,12 @@ int main(int argc, char *argv[])
 
   int size = (res->nodesetval) ? nodes->nodeNr : 0;
 
+  // TODO: make these platform independent (e.g. int32_t)
   struct rule_record {
-    int id; 
-    int linia;   // 
-    double pisu; // el peso
-    int rlen;
+    int id;        // The id of the rule (e.g. the number in the file)
+    int linia;     // The line where the rule starts
+    double pisu;   // The weight of the rule 
+    int rlen;      // The length of the string holding the rule
   };
  
   xmlNodePtr cur;
