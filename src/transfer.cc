@@ -78,9 +78,11 @@ int main(int argc, char *argv[])
 
     fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
     
-    void *regla = calloc(line.rlen, sizeof(wchar_t));
+    void *regla = calloc(line.rlen+1, sizeof(wchar_t));
     int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
     wstring wregla = header + wstring((wchar_t *)regla) + footer; 
+
+    wcerr << wregla << endl;
 
     xmlDocPtr doc = NULL;
     string rule = wstos(wregla);
@@ -94,7 +96,10 @@ int main(int argc, char *argv[])
     {
       wcerr << L"Error loading rule " << line.id << endl; 
       wcerr << wregla << endl;
+      exit(-1);
     }
+
+    free(regla);
   }
 
   xmlDocPtr doc, res = NULL;
@@ -105,15 +110,15 @@ int main(int argc, char *argv[])
   xsltStylesheetPtr last = NULL;
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
   { 
-    wcerr << L"=== applying rule ==========================================================" << endl;
     res = xsltApplyStylesheet(*it, res, NULL);
     if(res == NULL)
     {
       wcerr << L"Error." << endl;
+      break;
     }    
   }
 
-  xmlSaveFormatFileEnc("-", doc, "UTF-8", 1);
+  xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
 
 //    buf = xmlBufferCreate();
 

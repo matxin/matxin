@@ -71,7 +71,7 @@ wstring full(wstring &s)
     { 
       return L"xsl:element";
     }
-    else if(s == L"NODE" or s == L"CHUNK")
+    else if(s == L"NODE" or s == L"CHUNK" or s == L"SYN")
     {
       return s;
     }
@@ -190,11 +190,11 @@ int main(int argc, char *argv[])
          wcslen(res.c_str())
     };
  
-    void *regla = calloc(line.rlen+1, sizeof(wchar_t));
+    void *regla = calloc(line.rlen, sizeof(wchar_t));
     regla = (void *)res.c_str();
 
     fwrite((void *)&line, 1, sizeof(rule_record), output);
-    fwrite(regla, sizeof(wchar_t)+1, line.rlen, output);
+    fwrite(regla, sizeof(wchar_t), line.rlen, output);
 
     cur = cur->next;
   }
