@@ -37,7 +37,6 @@ matxin_gen_intra_LDADD =  -lfoma
 matxin_gen_move_SOURCES = sg_move.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_move_LDADD =  -lfoma  
 
-#matxin_gen_morf_SOURCES = morph_gen_new.cc data_manager.cc utf_converter.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_morf_SOURCES = morph_gen.cc data_manager.cc utf_converter.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_gen_morf_LDADD =  -lfoma  
 
