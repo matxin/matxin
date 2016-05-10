@@ -93,6 +93,7 @@ int main(int argc, char *argv[])
     else
     {
       wcerr << L"Error loading rule " << line.id << endl; 
+      wcerr << wregla << endl;
     }
   }
 
@@ -105,21 +106,31 @@ int main(int argc, char *argv[])
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
   { 
     wcerr << L"=== applying rule ==========================================================" << endl;
-    res = xsltApplyStylesheet(*it, doc, NULL);
-    
+    res = xsltApplyStylesheet(*it, res, NULL);
+    if(res == NULL)
+    {
+      wcerr << L"Error." << endl;
+    }    
   }
-  
-/*
 
+  xmlSaveFormatFileEnc("-", doc, "UTF-8", 1);
+
+//    buf = xmlBufferCreate();
+
+  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
+  {
+    xsltFreeStylesheet(*it);
+  } 
+
+/*
   res = xsltApplyStylesheet(cur, doc, NULL);
   xsltSaveResultToFile(stdout, res, cur);
+*/
 
-  xsltFreeStylesheet(cur);
   xmlFreeDoc(doc);
   xmlFreeDoc(res);
 
   xsltCleanupGlobals();
   xmlCleanupParser();
-*/
 }
 
