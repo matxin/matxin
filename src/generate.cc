@@ -101,17 +101,15 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             form = fstp.biltrans(mstr);
             form = form.substr(1, form.size() - 2);
             wcerr << L"FORM: " << form << L"\t||\t"  << L"\t||\t" << towstring(lem) << L" " << towstring(mi) << endl;
+            if(form[0] == L'@') 
+            {
+              form = L"#" + form.substr(1, form.size());
+            }
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
-          else if(lem != NULL && mi == NULL && smi != NULL) 
+          else if(lem != NULL && mi == NULL && smi != NULL)  // No morphology in target
           {
-            form = L"?" + towstring(lem) + L"|" + towstring(smi) ; 
-            wcerr << L"NOMI: " << form << L"\t||\t" << endl;
-            xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
-          }
-          else if(lem != NULL && mi == NULL && smi != NULL) 
-          {
-            form = L"#" + towstring(mi) ; 
+            form = L"%" + towstring(lem) + L"|" + towstring(smi) ; 
             wcerr << L"NOMI: " << form << L"\t||\t" << endl;
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
