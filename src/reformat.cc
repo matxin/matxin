@@ -508,7 +508,7 @@ bool empty_tag(format &file_format, vector<int> allocs)
 }
 
 
-wstring get_tags(format &file_format, const vector<int> &allocs)
+wstring get_tags(format &file_format, const vector<int> &allocs, bool whitespace)
 {
   vector<format_tag> output_tags;
 
@@ -567,6 +567,9 @@ wstring get_tags(format &file_format, const vector<int> &allocs)
   while ((pos = output.find(L"\\]\\]\\>")) != wstring::npos)
     output.replace(pos, 6, L"]]>");
 
+  if (output_tags.size()==0 && whitespace)
+    output += L" ";
+  
   return output;
 }
 
@@ -659,6 +662,7 @@ int main(int argc, char *argv[])
   map<int, map<int,word> > sentence;
   int min_alloc, max_alloc;
   bool upperCase = true;
+  bool whitespace = false;
 
   xmlTextReaderPtr reader;
   reader = xmlReaderForFd(0,"", NULL, 0);
@@ -685,8 +689,11 @@ int main(int argc, char *argv[])
     min_alloc = max_alloc = -1;
     procSENTENCE(reader, sentence, min_alloc, max_alloc);
 
-    if (argc > 1)
-      wcout << clear_tags(file_format, min_alloc, false);
+    if (argc > 1) {
+      wstring tag = clear_tags(file_format, min_alloc, false);
+      wcout << tag;
+      if (tag.size() != 0) prev_empty = true;
+    }
 
     map<int, map<int,word> >::iterator curSentence = sentence.begin();
     while (curSentence != sentence.end())
@@ -717,7 +724,13 @@ int main(int argc, char *argv[])
 
         if (!empty_tag(file_format, allocs))
         {
-          wcout << get_tags(file_format, allocs);
+	  if (form != L"." && form != L"," && form != L":" && form != L";" &&
+	      form != L"?" && form != L"!" && form != L")" && !prev_empty)
+	    whitespace = true;
+	  else
+	    whitespace = false;
+
+	  wcout << get_tags(file_format, allocs, whitespace);
           if (upperCase)
           {
             if (argc <= 1)
@@ -725,10 +738,6 @@ int main(int argc, char *argv[])
             form[0] = toupper(form[0]);
           }
           
-          if (form != L"." && form != L"," && form != L":" && form != L";" &&
-              form != L"?" && form != L"!" && form != L")" && !prev_empty)
-            wcout << L" ";
-
           if (mark_unknow && is_unknow)
             wcout << L"*";
 
