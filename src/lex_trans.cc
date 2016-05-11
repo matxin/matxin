@@ -572,7 +572,7 @@ wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs)
 
   // CHUNK motaren arabera tratamendu desberdina egiten da
   // (procNODE_AS edo procNODE_notAS)
-  if (chunkType.substr(0, 4) == L"adi-")
+  if (chunkType.substr(0, 4) == L"adi-")     // TODO: ETIKETA
   {
     // NODEa irakurri eta prozesatzen du, CHUNKaren burua izango da (head=true)
     tree += procNODE_AS(reader, true, head_attribs);

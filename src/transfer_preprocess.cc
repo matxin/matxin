@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
     cur = cur->next;
   }
     
-  wcerr << L"Result (" << size << L")" << endl ;
+  wcerr << size << L" rules processed." << endl ;
 
   xmlXPathFreeContext(context); 
   xmlFreeDoc(doc);
