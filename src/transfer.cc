@@ -110,7 +110,6 @@ int main(int argc, char *argv[])
   xmlDocPtr doc, res = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
 
-  xmlSubstituteEntitiesDefault(1);
   res = doc; 
   xsltStylesheetPtr last = NULL;
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
@@ -123,6 +122,7 @@ int main(int argc, char *argv[])
     }    
   }
 
+  xmlSubstituteEntitiesDefault(1);
   xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
 
 //    buf = xmlBufferCreate();

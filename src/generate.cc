@@ -67,7 +67,9 @@ void procAttr(xmlNodePtr p)
     while(attr)
     {
       xmlChar* value = xmlNodeListGetString(p->doc, attr->children, 1);
-      wcout << towstring(attr->name) << L"=\"" << towstring(value) << L"\"";
+      wstring val = towstring(value);
+      val = escape(val);
+      wcout << towstring(attr->name) << L"=\"" << val << L"\"";
       xmlFree(value); 
       if(attr->next)
       {
@@ -176,7 +178,6 @@ int main(int argc, char *argv[])
   xmlDocPtr doc, res = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
 
-  xmlSubstituteEntitiesDefault(1);
   res = xsltApplyStylesheet(sheet, doc, NULL); 
 
   // now generate 
@@ -188,6 +189,8 @@ int main(int argc, char *argv[])
   xmlNodeSetPtr nodes = rres->nodesetval;
 
   int size = (rres->nodesetval) ? nodes->nodeNr : 0;
+
+  xmlSubstituteEntitiesDefault(1);
 
   wcout << L"<corpus>" << endl;
 
