@@ -163,6 +163,13 @@ int main(int argc, char *argv[])
     exit(-1);
   }
 
+  struct rule_record {
+    int id; 
+    int linia;   // 
+    double pisu; // el peso
+    int rlen;
+  };
+
   string genRulesFile = string(argv[1]);
   string morphGenFile = string(argv[2]);
 
@@ -171,12 +178,66 @@ int main(int argc, char *argv[])
   fclose(transducer);
   fstp.initBiltrans();
 
-  xsltStylesheetPtr sheet = xsltParseStylesheetFile((const xmlChar *)genRulesFile.c_str());
+  FILE *rin = fopen(genRulesFile.c_str(), "rb");
+
+  vector<xsltStylesheetPtr> cascade; 
+
+  while(!feof(rin))
+  {
+    rule_record line = {0, 0, 0.0, 0} ; 
+    fread(&line, sizeof(rule_record), 1, rin);
+ 
+    if(line.rlen == 0)  
+    {
+      break;
+    }
+
+    if(debug) 
+    {
+      fwprintf(stderr, L"%d\t%d\tweight(%.4f)\tlen(%d)\n", line.id, line.linia, line.pisu, line.rlen);
+    }
+    
+    void *regla = calloc(line.rlen+1, sizeof(wchar_t));
+    int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
+    wstring wregla = header + wstring((wchar_t *)regla) + footer; 
+
+    if(debug) 
+    {
+      wcerr << wregla << endl;
+    }
+
+    xmlDocPtr doc = NULL;
+    string rule = wstos(wregla);
+    doc = xmlReadMemory(rule.c_str(), line.rlen*sizeof(wchar_t), "noname.xml", NULL, 0);
+    xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
+    if(xsls != NULL) 
+    {
+      cascade.push_back(xsls);
+    }
+    else
+    {
+      wcerr << L"Error loading rule " << line.id << endl; 
+      wcerr << wregla << endl;
+      exit(-1);
+    }
+
+    free(regla);
+  }
 
   xmlDocPtr doc, res = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
 
-  res = xsltApplyStylesheet(sheet, doc, NULL); 
+  res = doc; 
+  xsltStylesheetPtr last = NULL;
+  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
+  { 
+    res = xsltApplyStylesheet(*it, res, NULL);
+    if(res == NULL)
+    {
+      wcerr << L"Error." << endl;
+      break;
+    }    
+  }
 
   // now generate 
 
