@@ -214,8 +214,6 @@ int main(int argc, char *argv[])
 
   wcout << L"</corpus>" << endl;
 
-  wcerr << nodeCount << endl;
-
   xmlFreeDoc(doc);
   xmlFreeDoc(res);
 

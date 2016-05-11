@@ -42,6 +42,9 @@ int depth = 0;
 
 void procAttr(xmlNodePtr p, wstring &res)
 {
+    // TODO: Implement pattern checking with xsltCompilePattern, e.g. make sure 
+    //       that all patterns compile and if a pattern doesn't compile, then error.
+
     xmlAttr* attr = p->properties;
     if(attr) 
     {
