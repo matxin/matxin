@@ -25,6 +25,7 @@
 
 #include <lttoolbox/fst_processor.h>
 #include <lttoolbox/ltstr.h>
+#include <lttoolbox/ltstr.h>
 
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
@@ -52,6 +53,10 @@ wstring& escape(wstring &s)
    if(s == L"\"") 
    {
      s = L"&quot;" ;
+   }
+   else if(s == L"%\"|sent")
+   {
+     s = L"%&quot;|sent";
    }
 
    return s;
@@ -100,7 +105,10 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             mstr = L"^" + towstring(lem) + towstring(mi) + L"$";
             form = fstp.biltrans(mstr);
             form = form.substr(1, form.size() - 2);
-            wcerr << L"FORM: " << form << L"\t||\t"  << L"\t||\t" << towstring(lem) << L" " << towstring(mi) << endl;
+            if(debug) 
+            {
+              wcerr << L"FORM: " << form << L"\t||\t"  << L"\t||\t" << towstring(lem) << L" " << towstring(mi) << endl;
+            }
             if(form[0] == L'@') 
             {
               form = L"#" + form.substr(1, form.size());
@@ -110,7 +118,10 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
           else if(lem != NULL && mi == NULL && smi != NULL)  // No morphology in target
           {
             form = L"%" + towstring(lem) + L"|" + towstring(smi) ; 
-            wcerr << L"NOMI: " << form << L"\t||\t" << endl;
+            if(debug) 
+            {
+              wcerr << L"NOMI: " << form << L"\t||\t" << endl;
+            } 
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
           else
@@ -118,7 +129,10 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             wstring err = L"";
             if(lem) err = err + towstring(lem);
             if(mi) err = err + towstring(mi);
-            wcerr << L"FAIL: not received!\t||\t" << err << endl;
+            if(debug)
+            {
+              wcerr << L"FAIL: not received!\t||\t" << err << endl;
+            }
           }
            
         }
@@ -221,7 +235,7 @@ int main(int argc, char *argv[])
       exit(-1);
     }
 
-    free(regla);
+    //free(regla);
   }
 
   xmlDocPtr doc, res = NULL;
@@ -276,7 +290,7 @@ int main(int argc, char *argv[])
 
   wcout << L"</corpus>" << endl;
 
-  xmlFreeDoc(doc);
+//  xmlFreeDoc(doc);
   xmlFreeDoc(res);
 
   xsltCleanupGlobals();
