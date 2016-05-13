@@ -165,8 +165,12 @@ wstring text_attrib(wstring attributes, const wstring& nombre)
   Tokenize(attributes, tokens);
   for (size_t i = 0; i < tokens.size(); i++)
   {
-    vector<wstring> attribs;
+    while (i+1 < tokens.size() && tokens[i+1].find(L"=") == wstring::npos) {
+      tokens[i] = tokens[i] + L" " + tokens[i+1];
+      tokens.erase(tokens.begin() + i+1);
+    }
 
+    vector<wstring> attribs;
     Tokenize(tokens[i], attribs, L"=");
     if (attribs[0] == nombre)
     {
@@ -186,8 +190,12 @@ wstring text_allAttrib_except(wstring attributes, const wstring &nombre)
   Tokenize(attributes, tokens);
   for (size_t i = 0; i < tokens.size(); i++)
   {
-    vector<wstring> attribs;
+    while (i+1 < tokens.size() && tokens[i+1].find(L"=") == wstring::npos) {
+      tokens[i] = tokens[i] + L" " + tokens[i+1];
+      tokens.erase(tokens.begin() + i+1);
+    }
 
+    vector<wstring> attribs;
     Tokenize(tokens[i], attribs, L"=");
     if (attribs[0] == nombre)
     {
