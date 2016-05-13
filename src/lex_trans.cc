@@ -316,16 +316,25 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
   // alloc atributua mantentzen da
   if (tagName == L"NODE" and tagType != XML_READER_TYPE_END_ELEMENT)
   {
+    attributes = allAttrib_except(reader, L"form");
+
+    wstring mi = attrib(reader, "mi");
+    attributes = text_allAttrib_except(attributes, L"mi");
+
+    wstring lem = attrib(reader, "lem");
+    attributes = text_allAttrib_except(attributes, L"lem");
+
+    wstring ord = attrib(reader, "ord");
+    attributes = text_allAttrib_except(attributes, L"ord");
+
     nodes = L"<NODE ";
-    attributes = L"ref='" + write_xml(attrib(reader, "ord")) + L"'" +
-                 L" alloc='" + write_xml(attrib(reader, "alloc")) + L"'" +
-                 L" slem='" + write_xml(attrib(reader, "lem")) + L"'" +
-                 L" smi='" + write_xml(attrib(reader, "mi")) + L"'" +
-                 L" si='" + write_xml(attrib(reader, "si")) + L"'" +
-                 L" UpCase='" + write_xml(upper_type(attrib(reader, "form"),
-                                                     attrib(reader, "mi"),
-                                                     attrib(reader, "ord"))) +
-                 L"'";
+    attributes += L" ref='" + write_xml(ord) + L"'" +
+                  L" slem='" + write_xml(lem) + L"'" +
+                  L" smi='" + write_xml(mi) + L"'" +
+                  L" UpCase='" + write_xml(upper_type(attrib(reader, "form"),
+                                                      attrib(reader, "mi"),
+                                                      attrib(reader, "ord"))) +
+                  L"'";
 
     // FIXME: ETIKETA
     if (attrib(reader, "mi").substr(0,1) == L"W" or
@@ -674,10 +683,17 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
   tagType = xmlTextReaderNodeType(reader);
 
   // SENTENCE barruan dauden CHUNK guztietarako
-  while (ret == 1 and tagName == L"CHUNK")
+  while (ret == 1 and (tagName == L"CHUNK" or tagName == L"NODE"))
   {
     // CHUNKa irakurri eta prozesatzen du.
-    tree += procCHUNK(reader, L"");
+    if (tagName == L"CHUNK")
+    {
+      tree += procCHUNK(reader, L"");
+    }
+    else {
+      wstring head_attribs;
+      tree += procNODE_notAS(reader, true, L"", head_attribs);
+    }
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
