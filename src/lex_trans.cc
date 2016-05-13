@@ -38,6 +38,10 @@ FSTProcessor fstp;
 
 bool doTrace = false ;
 
+bool usingSem = false;
+bool usingLexSel = false;
+bool usingChunkType = false;
+
 
 wstring upper_type(wstring form, wstring mi, wstring ord)
 {
@@ -215,13 +219,27 @@ vector<wstring> get_translation(wstring lem, wstring mi,
                                 bool &unknown)
 {
   vector<wstring> translation;
-
-  wstring input = L"^" + lem + L"<parol>" + mi + L"$";  // FIXME: ETIKETA
+  wstring input ;
+  // FIXME: We shouldn't be calling this <parol> if it isn't a parol tag.
+  if(usingChunkType) 
+  {
+    input = L"^" + lem + L"<parol>" + mi + L"$";  // FIXME: ETIKETA
+  }
+  else
+  {
+    input = L"^" + lem + L"<mi>" + mi + L"$";  // FIXME: ETIKETA
+  }
   wstring trad = fstp.biltrans(input);
   trad = trad.substr(1, trad.size() - 2);
 
   unknown = false;
-  if (trad[0] == L'@' || trad.find(L">") < trad.find(L"<"))  // FIXME: ETIKETA
+  if(trad[0] == L'@' and !usingChunkType)
+  {
+    unknown = true;
+    trad = trad.substr(1, trad.size());
+  }
+
+  if (usingChunkType && (trad[0] == L'@' || trad.find(L">") < trad.find(L"<")))  // FIXME: ETIKETA
   {
     //if (mi.substr(0,2) != L"NP") {
       input = L"^" + lem + L"<parol>noKAT_" + mi.substr(0,2) + L"$";
@@ -303,6 +321,7 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
                  L" alloc='" + write_xml(attrib(reader, "alloc")) + L"'" +
                  L" slem='" + write_xml(attrib(reader, "lem")) + L"'" +
                  L" smi='" + write_xml(attrib(reader, "mi")) + L"'" +
+                 L" si='" + write_xml(attrib(reader, "si")) + L"'" +
                  L" UpCase='" + write_xml(upper_type(attrib(reader, "form"),
                                                      attrib(reader, "mi"),
                                                      attrib(reader, "ord"))) +
@@ -324,13 +343,18 @@ wstring procNODE_notAS(xmlTextReaderPtr reader, bool head,
       trad = get_translation(attrib(reader, "lem"),
                              attrib(reader, "mi"), unknown);
 
-      if (trad.size() > 1)
+      if (trad.size() > 1 && usingLexSel) 
+      {
         select = lexical_selection(parent_attribs, attributes, trad);
+      }
       else
+      {
         select = trad;
-
+      }
       if (trad.size() > 1)
+      {
         synonyms = getsyn(trad);
+      }
 
       if (select[0].find(L"\\") != wstring::npos)
         subnodes = multiNodes(reader, select[0], attributes);
@@ -438,7 +462,6 @@ wstring procNODE_AS(xmlTextReaderPtr reader, bool head, wstring& attributes)
   int tagType = xmlTextReaderNodeType(reader);
   bool unknown = false;
 
-
   if (tagName == L"NODE" and tagType != XML_READER_TYPE_END_ELEMENT)
   {
     // ord -> ref : ord atributuan dagoen balioa, ref atributuan idazten du
@@ -462,19 +485,23 @@ wstring procNODE_AS(xmlTextReaderPtr reader, bool head, wstring& attributes)
                                              unknown);
 
       if (trad.size() > 1)
+      {
         synonyms = getsyn(trad);
-
+      }
       attributes += L" " + text_allAttrib_except(text_allAttrib_except(trad[0], L"mi"), L"lem");
       attributes += L" lem='_" + text_attrib(trad[0], L"lem") + L"_'";
       attributes += L" mi='" + attrib(reader, "mi") + L"'";
 
       if (unknown)
+      {
         attributes += L" unknown='transfer'";
+      }
     }
     else
     {
       // Burua ez bada jatorrizko hizkuntzaren lem puntuen artean markatuko da
-      // (.lem.) eta mi atributua mantentzen da.
+      // (.lem.) eta mi atributua mantentzen da. 
+      // FIXME: EKIKETA
       attributes += L" lem='." + write_xml(attrib(reader, "lem")) + L".' mi='" +
                     write_xml(attrib(reader, "mi")) + L"'";
     }
@@ -549,10 +576,15 @@ wstring procCHUNK(xmlTextReaderPtr reader, wstring parent_attribs)
     // ord -> ref : ord atributuan dagoen balioa, ref atributuan idazten du
     // type : CHUNKaren type atributua itzultzen da
     // si atributua mantentzen da
-    chunkType = get_lexInfo(L"chunkType", attrib(reader, "type"));
+    if(usingChunkType) 
+    {
+      chunkType = get_lexInfo(L"chunkType", attrib(reader, "type"));
+    }
 
     if (chunkType == L"")
+    {
       chunkType = attrib(reader, "type");
+    }
 
     tree = L"<CHUNK ref='" + write_xml(attrib(reader, "ord")) +
            L"' type='" + write_xml(chunkType) + L"'" +
@@ -667,6 +699,10 @@ wstring procSENTENCE (xmlTextReaderPtr reader)
   return tree;
 }
 
+void usage(char *basename)
+{
+  wcout << basename << L" <bilingual dict> [<chunkType dict> <lexSel file> <semFile>]"  << endl;
+}
 
 int main(int argc, char *argv[])
 {
@@ -679,12 +715,31 @@ int main(int argc, char *argv[])
 //        <file name="spa-eus.lexical_selection.dat"/> <!-- matxin-spa-eus.lexical_selection.dat -->
 //        <file name="eus.semantic.dat"/> <!-- matxin-eus.semantic.dat -->
 
+  if(argc != 2 && argc != 5)
+  {
+    usage(argv[0]);
+    exit(-1);
+  }
+
+  if(argc == 5) 
+  {
+    usingSem = true;
+    usingChunkType = true;
+    usingLexSel = true;
+
+    string chunkTypeDictFile = string(argv[2]);
+    string lexSelFile = string(argv[3]);
+    string nounSemanticFile = string(argv[4]);
+
+    // Hasieraketa hauek konfigurazio fitxategi batetik irakurri beharko lirateke.
+    init_lexInfo(L"nounSem", nounSemanticFile);
+    init_lexInfo(L"chunkType", chunkTypeDictFile);
+    // Init lexical selection reading the rules file
+    init_lexical_selection(lexSelFile);
+  }
 
   // Add error checking 
   string dictionaryFile = string(argv[1]);
-  string chunkTypeDictFile = string(argv[2]);
-  string lexSelFile = string(argv[3]);
-  string nounSemanticFile = string(argv[4]);
 
   // Hiztegi elebidunaren hasieraketa.
   // Parametro moduan jasotzen den fitxagia erabiltzen da hasieraketarako.
@@ -693,11 +748,6 @@ int main(int argc, char *argv[])
   fclose(transducer);
   fstp.initBiltrans();
 
-  // Hasieraketa hauek konfigurazio fitxategi batetik irakurri beharko lirateke.
-  init_lexInfo(L"nounSem", nounSemanticFile);
-  init_lexInfo(L"chunkType", chunkTypeDictFile);
-  // Init lexical selection reading the rules file
-  init_lexical_selection(lexSelFile);
 
   while (true)
   {
