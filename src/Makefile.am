@@ -5,8 +5,9 @@ matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
 matxindir = $(prefix)/share/matxin
 
 bin_PROGRAMS = matxin-chunker matxin-xfer-lex matxin-xfer-intra matxin-xfer-inter matxin-xfer-adpos \
-	       matxin-xfer-verb matxin-gen-inter matxin-gen-intra matxin-gen-move matxin-transfer matxin-preprocess-transfer \
-	       matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki matxin-deshtml matxin-desrtf matxin-generate
+	       matxin-xfer-verb matxin-gen-inter matxin-gen-intra matxin-gen-move matxin-transfer \
+	       matxin-preprocess-transfer matxin-gen-morf matxin-reformat matxin-destxt matxin-deswiki \
+	       matxin-deshtml matxin-desrtf matxin-generate matxin-linearise
 
 bin_SCRIPTS = matxin matxin-translator fst2regex.pl matxin-gen-modes matxin-validate-modes
 
@@ -45,6 +46,9 @@ matxin_reformat_LDADD = -lfoma
 
 matxin_generate_SOURCES = generate.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_generate_LDADD =  -lfoma  
+
+matxin_linearise_SOURCES = linearise.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
+matxin_linearise_LDADD =  -lfoma  
 
 matxin_transfer_SOURCES = transfer.cc utf_converter.cc data_manager.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_transfer_LDADD =  -lfoma  
