@@ -102,7 +102,7 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
           xmlChar *mi = xmlGetProp(p, (xmlChar *)"mi");
           if(mi != NULL && lem != NULL) 
           {
-            mstr = L"^" + towstring(lem) + L"<mi>" + towstring(mi) + L"$";
+            mstr = L"^" + towstring(lem) + towstring(mi) + L"$";
             form = fstp.biltrans(mstr);
             form = form.substr(1, form.size() - 2);
             if(debug) 
