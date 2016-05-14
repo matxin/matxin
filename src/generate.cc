@@ -111,7 +111,7 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             }
             if(form[0] == L'@') 
             {
-              form = L"#" + form.substr(1, form.size());
+              form = L"#" + towstring(lem) + L"|" + towstring(mi); 
             }
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
@@ -121,6 +121,15 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             if(debug) 
             {
               wcerr << L"NOMI: " << form << L"\t||\t" << endl;
+            } 
+            xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
+          }
+          else if(lem != NULL && mi == NULL && smi == NULL)  // No morphology in source or target
+          {
+            form = L"=" + towstring(lem); 
+            if(debug) 
+            {
+              wcerr << L"NOMI2: " << form << L"\t||\t" << endl;
             } 
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
