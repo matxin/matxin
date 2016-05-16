@@ -25,7 +25,6 @@
 
 #include <lttoolbox/fst_processor.h>
 #include <lttoolbox/ltstr.h>
-#include <lttoolbox/ltstr.h>
 
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
@@ -39,27 +38,15 @@
 
 using namespace std;
 
-bool debug = false ;
+bool debug = false;
+bool rawGen = false;
 
 int nodeCount = 0;
+int depth = 0;
 
 void usage(char *name)
 {
-  wcout << L"" << name << L" <generation rules> <morphological generator>" << endl ;
-}
-
-wstring& escape(wstring &s)
-{
-   if(s == L"\"") 
-   {
-     s = L"&quot;" ;
-   }
-   else if(s == L"%\"|sent")
-   {
-     s = L"%&quot;|sent";
-   }
-
-   return s;
+  wcout << L"" << name << L" [-g] <generation rules> <morphological generator>" << endl ;
 }
 
 void procAttr(xmlNodePtr p)
@@ -73,8 +60,7 @@ void procAttr(xmlNodePtr p)
     {
       xmlChar* value = xmlNodeListGetString(p->doc, attr->children, 1);
       wstring val = towstring(value);
-      val = escape(val);
-      wcout << towstring(attr->name) << L"=\"" << val << L"\"";
+      wcout << towstring(attr->name) << L"=\"" << write_xml(val) << L"\"";
       xmlFree(value); 
       if(attr->next)
       {
@@ -91,6 +77,11 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
     {
       if(p->type == 1)
       {
+        bool sub = false;
+        if(p->xmlChildrenNode)
+        {
+          sub = true;
+        }
         wcout << L"<" << towstring(p->name); 
         if(!xmlStrcmp(p->name, (xmlChar *)"NODE")) 
         {
@@ -107,7 +98,7 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             form = form.substr(1, form.size() - 2);
             if(debug) 
             {
-              wcerr << L"FORM: " << form << L"\t||\t"  << L"\t||\t" << towstring(lem) << L" " << towstring(mi) << endl;
+              wcerr << sub << L" " << depth << L"[" << nodeCount << L"]" << L"FORM: " << form << L"\t||\t"  << L"\t||\t" << towstring(lem) << L" " << towstring(mi) << endl;
             }
             if(form[0] == L'@') 
             {
@@ -120,7 +111,7 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             form = L"%" + towstring(lem) + L"|" + towstring(smi) ; 
             if(debug) 
             {
-              wcerr << L"NOMI: " << form << L"\t||\t" << endl;
+              wcerr << sub << L" " << depth << L"[" << nodeCount << L"]" << L"NOMI: " << form << L"\t||\t" << endl;
             } 
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
@@ -129,7 +120,7 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             form = L"=" + towstring(lem); 
             if(debug) 
             {
-              wcerr << L"NOMI2: " << form << L"\t||\t" << endl;
+              wcerr << sub << L" " << depth << L"[" << nodeCount << L"]" << L"NOMI2: " << form << L"\t||\t" << endl;
             } 
             xmlSetProp(p, (xmlChar *)"form", (xmlChar *)wstos(form).c_str());
           }
@@ -140,10 +131,9 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
             if(mi) err = err + towstring(mi);
             if(debug)
             {
-              wcerr << L"FAIL: not received!\t||\t" << err << endl;
+              wcerr << sub << L" " << depth << L"[" << nodeCount << L"]" << L"FAIL: not received!\t||\t" << err << endl;
             }
           }
-           
         }
         procAttr(p);
       }
@@ -155,7 +145,9 @@ void procNode(FSTProcessor &fstp, xmlNodePtr p)
       if(p->xmlChildrenNode)
       {
         wcout << L">";
+        depth = depth + 1;
         procNode(fstp, p->xmlChildrenNode);
+        depth = depth - 1;
         wstring name = towstring(p->name);
         wcout << L"</" << name << L">";
       }
@@ -180,7 +172,27 @@ int main(int argc, char *argv[])
   // wcout.imbue doesn't have any effect but the in/out streams use the proper encoding.
   locale::global(locale(""));
 
-  if(argc != 3)
+  string genRulesFile; 
+  string morphGenFile;
+
+  if(argc == 3)
+  {
+    genRulesFile = string(argv[1]);
+    morphGenFile = string(argv[2]);
+  }
+  else if(argc == 4) 
+  {
+    string opt = string(argv[1]); 
+    if(opt != "-g") 
+    {
+      usage(argv[0]);
+      exit(-1);
+    }
+    rawGen = true;
+    genRulesFile = string(argv[2]);
+    morphGenFile = string(argv[3]);
+  }
+  else
   {
     usage(argv[0]);
     exit(-1);
@@ -193,8 +205,6 @@ int main(int argc, char *argv[])
     int rlen;
   };
 
-  string genRulesFile = string(argv[1]);
-  string morphGenFile = string(argv[2]);
 
   FILE *transducer = fopen(morphGenFile.c_str(), "r");
   fstp.load(transducer);
@@ -250,24 +260,48 @@ int main(int argc, char *argv[])
   xmlDocPtr doc, res = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
 
+  if(doc == NULL) 
+  {
+    wcerr << L"Error reading document." << endl ;
+    exit(-1);
+  }
+
+  const char *params[16 + 1];
+  int nbparams = 0;
+  params[nbparams] = NULL;
+
   res = doc; 
   xsltStylesheetPtr last = NULL;
+  int rcount = 0;
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
   { 
-    res = xsltApplyStylesheet(*it, res, NULL);
+    res = xsltApplyStylesheet(*it, res, params);
+
     if(res == NULL)
     {
       wcerr << L"Error." << endl;
-      break;
+      exit(-1);
     }    
+
+    if(debug) 
+    {
+      wcerr << L"[" << rcount << L"]==========================================================================" << endl;
+      xmlSaveFormatFileEnc("/dev/stderr", res, "UTF-8", 1);
+      FILE *err = stderr;
+      fflush(err);
+      wcerr << L"[" << rcount << L"]++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
+    }
+
+    xsltFreeStylesheet(*it);
+    rcount++;
   }
 
   // now generate 
 
-  xmlChar *findRules = (xmlChar*)"//SENTENCE" ;
+  xmlChar *sentences = (xmlChar*)"//SENTENCE" ;
 
   xmlXPathContextPtr context = xmlXPathNewContext(res);
-  xmlXPathObjectPtr rres = xmlXPathEvalExpression(findRules, context);
+  xmlXPathObjectPtr rres = xmlXPathEvalExpression(sentences, context);
   xmlNodeSetPtr nodes = rres->nodesetval;
 
   int size = (rres->nodesetval) ? nodes->nodeNr : 0;
@@ -280,6 +314,7 @@ int main(int argc, char *argv[])
   for(int i = 0; i < size; i++) 
   {
     cur = nodes->nodeTab[i];
+    nodeCount = 0;
 
     wcout << L"<" << towstring(cur->name);
     procAttr(cur);
@@ -298,6 +333,7 @@ int main(int argc, char *argv[])
   }
 
   wcout << L"</corpus>" << endl;
+//  wcerr << nodeCount << endl;
 
 //  xmlFreeDoc(doc);
   xmlFreeDoc(res);
