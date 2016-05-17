@@ -463,9 +463,16 @@ void procSENTENCE (xmlTextReaderPtr reader, map<int, map<int,word> > &sentence,
   tagName = getTagName(reader);
   tagType = xmlTextReaderNodeType(reader);
 
-  while (ret == 1 and tagName == L"CHUNK")
+  while (ret == 1 and (tagName == L"CHUNK" or tagName == L"NODE"))
   {
-    procCHUNK(reader, sentence, min_alloc, max_alloc);
+    if (tagName == L"CHUNK")
+    {
+      procCHUNK(reader, sentence, min_alloc, max_alloc);
+    }
+    else
+    {
+      procNODE(reader, sentence, 1, min_alloc, max_alloc);
+    }
 
     ret = nextTag(reader);
     tagName = getTagName(reader);
@@ -771,7 +778,7 @@ int main(int argc, char *argv[])
   if (argc > 1)
     wcout << clear_tags(file_format, max_alloc, true);
   else
-    cout << endl;
+    wcout << endl;
 
   if (ret != 1 or tagName != L"corpus" or tagType != XML_READER_TYPE_END_ELEMENT)
   {
