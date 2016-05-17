@@ -352,7 +352,7 @@ void procNODE(xmlTextReaderPtr reader, map<int, map<int,word> > &sentence,
       max_alloc = alloc;
     }
 
-    sentence[chunkOrd][watoi(attrib(reader, "ord").c_str())].form = attrib(reader, "form");
+    sentence[chunkOrd][watoi(attrib(reader, "ord").c_str())].form = read_xml(attrib(reader, "form"));
     sentence[chunkOrd][watoi(attrib(reader, "ord").c_str())].alloc = attrib(reader, "alloc");
     if (attrib(reader, "unknown") != L"")
       sentence[chunkOrd][watoi(attrib(reader, "ord").c_str())].is_unknow = true;
@@ -740,8 +740,6 @@ int main(int argc, char *argv[])
 	  wcout << get_tags(file_format, allocs, whitespace);
           if (upperCase)
           {
-            if (argc <= 1)
-              wcout << endl;
             form[0] = toupper(form[0]);
           }
           
@@ -766,6 +764,12 @@ int main(int argc, char *argv[])
       curSentence++;
     }
 
+    if (argc <= 1)
+    {
+      wcout << endl;
+      prev_empty = true;
+    }
+
     sentence.clear();
 
     ret = nextTag(reader);
@@ -776,9 +780,9 @@ int main(int argc, char *argv[])
   xmlCleanupParser();
 
   if (argc > 1)
+  {
     wcout << clear_tags(file_format, max_alloc, true);
-  else
-    wcout << endl;
+  }
 
   if (ret != 1 or tagName != L"corpus" or tagType != XML_READER_TYPE_END_ELEMENT)
   {

@@ -67,6 +67,40 @@ wstring write_xml(wstring s)
 }
 
 
+wstring read_xml(wstring s)
+{
+  size_t pos = 0;
+  while ((pos = s.find(L"&quot;")) != wstring::npos)
+  {
+    s.replace(pos, 6, L"\"");
+  }
+
+  while ((pos = s.find(L"&apos;")) != wstring::npos)
+  {
+    s.replace(pos, 6, L"\'");
+  }
+
+  while ((pos = s.find(L"&lt;")) != wstring::npos)
+  {
+    s.replace(pos, 4, L"<");
+  }
+
+  while ((pos = s.find(L"&gt;")) != wstring::npos)
+  {
+    s.replace(pos, 4, L">");
+  }
+
+  pos=0;
+  while ((pos = s.find(L"&amp;", pos)) != wstring::npos)
+  {
+    s.replace(pos, 5, L"&");
+    pos++;
+  }
+
+  return s;
+}
+
+
 //Momentuko etiketaren izena itzultzen du.
 wstring getTagName(xmlTextReaderPtr reader)
 {

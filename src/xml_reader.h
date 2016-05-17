@@ -33,6 +33,8 @@ string xmlc2s(xmlChar const * entrada);
 
 wstring write_xml(wstring input);
 
+wstring read_xml(wstring input);
+
 wstring getTagName(xmlTextReaderPtr reader);
 
 int nextTag(xmlTextReaderPtr reader);
