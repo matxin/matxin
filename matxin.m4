@@ -1,7 +1,7 @@
 # matxin.m4 - Macros to locate and utilise matxin libraries -*- Autoconf -*-
 # serial 1 (matxin-3.4.0)
 #
-# Copyright (C) 2013--2015 Universitat d'Alacant / Universidad de Alicante
+# Copyright (C) 2013--2016 Universitat d'Alacant / Universidad de Alicante
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,50 +17,50 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-# AP_CHECK_LING([ID], [MONOLINGUAL_PACKAGE])
+# MATXIN_CHECK_LING([ID], [MONOLINGUAL_PACKAGE])
 #
 # Check to see whether MONOLINGUAL_PACKAGE exists, and if so sets
-# AP_LIB[ID] and AP_SRC[ID].
+# MATXIN_LIB[ID] and MATXIN_SRC[ID].
 #
-# As an example, AP_CHECK_LING([1], [matxin-fie]) would check that
-# matxin-fie exists, and set AP_LIB1 and AP_SRC1 to the paths
+# As an example, MATXIN_CHECK_LING([1], [matxin-fie]) would check that
+# matxin-fie exists, and set MATXIN_LIB1 and MATXIN_SRC1 to the paths
 # containing the binaries and sources respectively of that monolingual
 # language package.
 #
 # Also sets up options --with-lang[ID] (e.g. --with-lang1) if the user
 # wants to use the source code checkout instead of installed files.
 # ------------------------------------------
-AC_DEFUN([AP_CHECK_LING],
+AC_DEFUN([MATXIN_CHECK_LING],
 [
-  AC_ARG_VAR([AP_SRC][$1], [Path to $2 sources, same as AP_LIB$1 if --with-lang$1 set])
-  AC_ARG_VAR([AP_LIB][$1], [Path to $2 binaries, same as AP_SRC$1 if --with-lang$1 set])
-  AC_ARG_VAR([AP_SUBDIRS], [List of all --with-lang dirs; add it to SUBDIRS to make configure-specified dependencies recursively])
+  AC_ARG_VAR([MATXIN_SRC][$1], [Path to $2 sources, same as MATXIN_LIB$1 if --with-lang$1 set])
+  AC_ARG_VAR([MATXIN_LIB][$1], [Path to $2 binaries, same as MATXIN_SRC$1 if --with-lang$1 set])
+  AC_ARG_VAR([MATXIN_SUBDIRS], [List of all --with-lang dirs; add it to SUBDIRS to make configure-specified dependencies recursively])
   AC_ARG_WITH([lang][$1],
     [dnl
 AS_HELP_STRING([--with-lang][$1],dnl
-[Uninstalled source directory for $2, defines AP_SRC$1 and AP_LIB$1 for Makefile, otherwise these are set to paths of installed files.])
+[Uninstalled source directory for $2, defines MATXIN_SRC$1 and MATXIN_LIB$1 for Makefile, otherwise these are set to paths of installed files.])
     ],
     [
-      AP_LIB$1=$withval
-      AP_SRC$1=$withval
+      MATXIN_LIB$1=$withval
+      MATXIN_SRC$1=$withval
       echo "Using $2 from $withval"
-      AP_SUBDIRS="$AP_SUBDIRS $withval"
+      MATXIN_SUBDIRS="$MATXIN_SUBDIRS $withval"
     ],
     [
       # TODO: PKG_CHECK_MODULES sets useless variables, while _EXISTS
       # doesn't error if not found, should make a PKG_CHECK macro that
       # errors but does not set _CFLAGS/_LIBS
       PKG_CHECK_MODULES(m4_toupper(m4_bpatsubst($2, [-], [_])), [$2])
-      AP_LIB$1=`pkg-config --variable=dir $2`
-      AP_SRC$1=`pkg-config --variable=srcdir $2`
+      MATXIN_LIB$1=`pkg-config --variable=dir $2`
+      MATXIN_SRC$1=`pkg-config --variable=srcdir $2`
     ])
-  if test -z "$AP_SRC$1" || ! test -d "$AP_SRC$1"; then
-    AC_MSG_ERROR([Could not find sources dir for $2 (AP_SRC$1="$AP_SRC$1")])
+  if test -z "$MATXIN_SRC$1" || ! test -d "$MATXIN_SRC$1"; then
+    AC_MSG_ERROR([Could not find sources dir for $2 (MATXIN_SRC$1="$MATXIN_SRC$1")])
   fi
 ])
 
 
-# AP_MKINCLUDE()
+# MATXIN_MKINCLUDE()
 #
 # Creates the file ap_include.am and sets the variable ap_include to
 # point to this path. Now in your Makefile.am you can include
@@ -88,7 +88,7 @@ AS_HELP_STRING([--with-lang][$1],dnl
 #     .deps/intermediate.dix: original.dix .deps/.d
 # 
 # ------------------------------------------
-AC_DEFUN([AP_MKINCLUDE],
+AC_DEFUN([MATXIN_MKINCLUDE],
 [
   AC_SUBST_FILE(ap_include)
   ap_include=$srcdir/ap_include.am
@@ -128,7 +128,7 @@ langs:
 	  failcom='exit 1'; \
 	fi; \
 	dot_seen=no; \
-	list='\$(AP_SUBDIRS)'; \
+	list='\$(MATXIN_SUBDIRS)'; \
 	for subdir in \$\$list; do \
 	  echo "Making \$\$subdir"; \
 	  (\$(am__cd) \$\$subdir && \$(MAKE) \$(AM_MAKEFLAGS) all-am) \
