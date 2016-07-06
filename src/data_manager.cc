@@ -19,6 +19,8 @@
 
 #include "data_manager.h"
 #include "matxin_string_utils.h"
+#include "string_utils.h"
+
 
 chunk text2chunk(wstring text)
 {
@@ -775,21 +777,24 @@ void init_lexInfo(wstring name, string fitxName)
   {
     // Remove comments
     if (lerro.find(L'#') != wstring::npos)
+    {
       lerro = lerro.substr(0, lerro.find(L'#'));
+    }
 
     // Remove whitespace and so...
     for (int i = 0; i < int(lerro.size()); i++)
     {
-      if (lerro[i] == L' ' and (lerro[i+1] == L' ' or lerro[i+1] == L'\t'))
+      if (lerro[i] == L' ' && (lerro[i+1] == L' ' or lerro[i+1] == L'\t')) 
+      {
         lerro[i] = L'\t';
-      if ((lerro[i] == L' ' or lerro[i] == L'\t') and
-          (i == 0 or lerro[i-1] == L'\t'))
+      }
+      if ((lerro[i] == L' ' or lerro[i] == L'\t') && (i == 0 or lerro[i-1] == L'\t'))
       {
         lerro.erase(i,1);
         i--;
       }
     }
-    if (lerro[lerro.size()-1] == L' ' or lerro[lerro.size()-1] == L'\t') 
+    if (lerro[lerro.size()-1] == L' ' || lerro[lerro.size()-1] == L'\t') 
     {
       int x = int(lerro.size()) - 1;
       if(x == 0) {
@@ -802,6 +807,9 @@ void init_lexInfo(wstring name, string fitxName)
 
     wstring key = lerro.substr(0,pos);
     wstring value = lerro.substr(pos+1);
+
+    key = StringUtils::trim(key);
+    value = StringUtils::trim(value);
 
     lex.info[key] = value;
   }
