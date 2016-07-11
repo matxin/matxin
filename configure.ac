@@ -316,8 +316,8 @@ fi
 #
 # Checks for libraries.
 #
-AC_CHECK_LIB(boost_system, main, [true],AC_MSG_ERROR([boost_system found]))
-AC_CHECK_LIB(foma, main, [true],AC_MSG_ERROR([foma found]))
+AC_CHECK_LIB(boost_system, main, [true],AC_MSG_ERROR([boost_system not found]))
+AC_CHECK_LIB(foma, main, [true],AC_MSG_ERROR([foma not found]))
 
 PKG_CHECK_MODULES(MATXIN, [dnl
  lttoolbox >= required_lttoolbox_version dnl
