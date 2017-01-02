@@ -17,21 +17,20 @@
  *  02110-1301  USA
  */
 
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <locale>
 #include <clocale>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <string>
 
+#include <libxslt/transform.h>
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
-#include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
+#include "data_manager.h"
 #include "matxin_string_utils.h"
 #include "transfer.h"
-
-#include <data_manager.h>
 
 using namespace std;
 
@@ -91,7 +90,7 @@ int main(int argc, char *argv[])
 
     xmlDocPtr doc = NULL;
     string rule = wstos(wregla);
-    doc = xmlReadMemory(rule.c_str(), line.rlen*sizeof(wchar_t), "noname.xml", NULL, 0);
+    doc = xmlReadMemory(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
     xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
     if(xsls != NULL) 
     {
