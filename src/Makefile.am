@@ -1,4 +1,4 @@
-EXTRA_DIST = data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml
+EXTRA_DIST = data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml xmldoc.h xsltstylesheet.h
 
 matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
 
@@ -50,7 +50,7 @@ matxin_generate_LDADD =  -lfoma
 matxin_linearise_SOURCES = linearise.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_linearise_LDADD =  -lfoma  
 
-matxin_transfer_SOURCES = transfer.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
+matxin_transfer_SOURCES = transfer.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h xmldoc.cc xsltstylesheet.cc  #io_redirect_handler.cc io_redirect_handler.h
 matxin_transfer_LDADD =  -lfoma  
 
 matxin_preprocess_transfer_SOURCES = transfer_preprocess.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
