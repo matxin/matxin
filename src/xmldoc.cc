@@ -39,6 +39,8 @@ xmlDoc::xmlDoc(const xsltStylesheet &style, const xmlDoc &doc,
     throw;
 }
 
+const xmlDocPtr xmlDoc::get_doc() const { return doc_.get(); }
+
 int xmlSaveFormatFileEnc(const char *filename, xmlDoc cur, const char *encoding,
                          int format) {
   ::xmlSaveFormatFileEnc(filename, cur.get_doc(), encoding, format);
