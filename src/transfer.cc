@@ -17,21 +17,20 @@
  *  02110-1301  USA
  */
 
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <locale>
 #include <clocale>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <string>
 
+#include <libxslt/transform.h>
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
-#include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 
+#include "data_manager.h"
 #include "matxin_string_utils.h"
 #include "transfer.h"
-
-#include <data_manager.h>
 
 using namespace std;
 
@@ -91,7 +90,7 @@ int main(int argc, char *argv[])
 
     xmlDocPtr doc = NULL;
     string rule = wstos(wregla);
-    doc = xmlReadMemory(rule.c_str(), line.rlen*sizeof(wchar_t), "noname.xml", NULL, 0);
+    doc = xmlReadMemory(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
     xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
     if(xsls != NULL) 
     {
@@ -107,23 +106,25 @@ int main(int argc, char *argv[])
     free(regla);
   }
 
-  xmlDocPtr doc, res = NULL;
+  xmlDocPtr doc = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
+  std::vector<xmlDocPtr> docs;
 
-  res = doc; 
-  xsltStylesheetPtr last = NULL;
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
   { 
-    res = xsltApplyStylesheet(*it, res, NULL);
+    xmlDocPtr res = xsltApplyStylesheet(*it, doc, NULL);
     if(res == NULL)
     {
       wcerr << L"Error." << endl;
       break;
     }    
+
+    docs.push_back(doc);
+    doc = res;
   }
 
   xmlSubstituteEntitiesDefault(1);
-  xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
+  xmlSaveFormatFileEnc("-", doc, "UTF-8", 1);
 
 //    buf = xmlBufferCreate();
 
@@ -138,7 +139,11 @@ int main(int argc, char *argv[])
 */
 
   xmlFreeDoc(doc);
-  xmlFreeDoc(res);
+
+  for (std::vector<xmlDocPtr>::const_reverse_iterator it = docs.crbegin();
+       it != docs.crend(); ++it) {
+    xmlFreeDoc(*it);
+  }
 
   xsltCleanupGlobals();
   xmlCleanupParser();
