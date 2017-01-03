@@ -31,8 +31,6 @@
 #include "data_manager.h"
 #include "matxin_string_utils.h"
 #include "transfer.h"
-#include "xmldoc.h"
-#include "xsltstylesheet.h"
 
 using namespace std;
 
@@ -64,7 +62,7 @@ int main(int argc, char *argv[])
 
   FILE *rin = fopen(argv[1], "rb");
 
-  vector<matxin::xsltStylesheet> cascade; 
+  vector<xsltStylesheetPtr> cascade; 
 
   while(!feof(rin))
   {
@@ -90,26 +88,57 @@ int main(int argc, char *argv[])
       wcerr << wregla << endl;
     }
 
+    xmlDocPtr doc = NULL;
     string rule = wstos(wregla);
-    cascade.emplace_back(
-        matxin::xmlDoc(rule.c_str(), rule.size(), "noname.xml", NULL, 0));
+    doc = xmlReadMemory(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
+    xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
+    if(xsls != NULL) 
+    {
+      cascade.push_back(xsls);
+    }
+    else
+    {
+      wcerr << L"Error loading rule " << line.id << endl; 
+      wcerr << wregla << endl;
+      exit(-1);
+    }
+
     free(regla);
   }
 
-  matxin::xmlDoc res(0, "/", NULL, 0);
+  xmlDocPtr doc, res = NULL;
+  doc = xmlReadFd(0, "/", NULL, 0);
 
-  {
-    const std::vector<matxin::xsltStylesheet>::const_iterator cascade_end =
-        cascade.cend();
-
-    for (vector<matxin::xsltStylesheet>::const_iterator cascade_iterator =
-             cascade.begin();
-         cascade_iterator != cascade_end; ++cascade_iterator)
-      res = matxin::xmlDoc(*cascade_iterator, res, NULL);
+  res = doc; 
+  xsltStylesheetPtr last = NULL;
+  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
+  { 
+    res = xsltApplyStylesheet(*it, res, NULL);
+    if(res == NULL)
+    {
+      wcerr << L"Error." << endl;
+      break;
+    }    
   }
 
   xmlSubstituteEntitiesDefault(1);
-  matxin::xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
+  xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
+
+//    buf = xmlBufferCreate();
+
+  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
+  {
+    xsltFreeStylesheet(*it);
+  } 
+
+/*
+  res = xsltApplyStylesheet(cur, doc, NULL);
+  xsltSaveResultToFile(stdout, res, cur);
+*/
+
+  xmlFreeDoc(doc);
+  xmlFreeDoc(res);
+
   xsltCleanupGlobals();
   xmlCleanupParser();
 }
