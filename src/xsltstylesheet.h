@@ -1,8 +1,12 @@
 #ifndef XSLTSTYLESHEET_H
 #define XSLTSTYLESHEET_H
 
+// xsltStylesheet
 // xsltStylesheetPtr
 #include <libxslt/xsltInternals.h>
+
+// std::shared_ptr
+#include <memory>
 
 namespace matxin {
 class xmlDoc;
@@ -11,19 +15,12 @@ class xsltStylesheet {
 public:
   xsltStylesheet(const xmlDoc &doc);
 
-  ~xsltStylesheet();
-
-  xsltStylesheet(const xsltStylesheet &style) = delete;
-  xsltStylesheet &operator=(const xsltStylesheet &style) = delete;
-  xsltStylesheet &operator=(xsltStylesheet &&style) = delete;
-
-  xsltStylesheet(xsltStylesheet &&style) = default;
-
 private:
   friend xmlDoc;
-  const xsltStylesheetPtr &get_style() const { return style_; }
 
-  const xsltStylesheetPtr style_;
+  const xsltStylesheetPtr get_style() const;
+
+  std::shared_ptr<::xsltStylesheet> style_;
 };
 }
 

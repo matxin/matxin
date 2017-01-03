@@ -1,8 +1,11 @@
 #ifndef XMLDOC_H
 #define XMLDOC_H
 
+// xmlDoc
 // xmlDocPtr
 #include <libxml/tree.h>
+
+#include <memory>
 
 namespace matxin {
 class xsltStylesheet;
@@ -19,19 +22,12 @@ public:
   // xsltApplyStylesheet
   xmlDoc(const xsltStylesheet &style, const xmlDoc &doc, const char **params);
 
-  ~xmlDoc();
-
-  xmlDoc(const xmlDoc &doc) = delete;
-  xmlDoc &operator=(const xmlDoc &doc) = delete;
-  xmlDoc &operator=(xmlDoc &&doc) = delete;
-
-  xmlDoc(xmlDoc &&doc) = default;
-
 private:
   friend xsltStylesheet;
-  const xmlDocPtr &get_doc() const { return doc_; }
 
-  const xmlDocPtr doc_;
+  const xmlDocPtr get_doc() const;
+
+  std::shared_ptr<::xmlDoc> doc_;
 };
 }
 
