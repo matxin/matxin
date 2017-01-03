@@ -74,9 +74,9 @@ int main(int argc, char *argv[]) {
                  line.linia, line.pisu, line.rlen);
       }
 
-      void *regla = calloc(line.rlen + 1, sizeof(wchar_t));
-      int res = fread(regla, line.rlen, sizeof(wchar_t), rin);
-      wstring wregla = header + wstring((wchar_t *)regla) + footer;
+      std::vector<wchar_t> regla(line.rlen + 1);
+      int res = fread(regla.data(), line.rlen, sizeof(wchar_t), rin);
+      wstring wregla = header + wstring(regla.data()) + footer;
 
       if (debug) {
         wcerr << wregla << endl;
@@ -86,8 +86,6 @@ int main(int argc, char *argv[]) {
       matxin::xsltStylesheet style(rule.c_str(), rule.size(), "noname.xml",
                                    NULL, 0);
       cascade.push_back(style);
-
-      free(regla);
     }
 
     matxin::xmlDoc doc(0, "/", NULL, 0);
