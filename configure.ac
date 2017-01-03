@@ -193,7 +193,7 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_LANG([C++])
 
-# This is the right thing to use
+# This would be the right thing to use, were it to work.
 #AX_CXX_COMPILE_STDCXX_11
 
 CXXFLAGS="$CXXFLAGS -std=gnu++11"
@@ -210,19 +210,19 @@ else ARCH=$($(which arch))
     if test x$ARCH = xppc
     then
 AC_MSG_RESULT([PowerPC])
-    CFLAGS="$CFLAGS -ansi -mpowerpc -maltivec -fno-pic -fomit-frame-pointer"
-    CXXFLAGS="$CXXFLAGS -ansi -mpowerpc -maltivec -fno-pic -fomit-frame-pointer"
+    CFLAGS="$CFLAGS -mpowerpc -maltivec -fno-pic -fomit-frame-pointer"
+    CXXFLAGS="$CXXFLAGS -mpowerpc -maltivec -fno-pic -fomit-frame-pointer"
     else
     if test x$ARCH = xi686
     then
 AC_MSG_RESULT([i686])
-    CFLAGS="$CFLAGS -ansi -march=i686 -O3 -fno-pic -fomit-frame-pointer"
-    CXXFLAGS="$CXXFLAGS -ansi -march=i686 -O3 -fno-pic \
+    CFLAGS="$CFLAGS -march=i686 -O3 -fno-pic -fomit-frame-pointer"
+    CXXFLAGS="$CXXFLAGS -march=i686 -O3 -fno-pic \
               -fomit-frame-pointer"
     else
 AC_MSG_RESULT([Other])
-    CFLAGS="$CFLAGS -ansi -O3"
-    CXXFLAGS="$CXXFLAGS -ansi -O3"
+    CFLAGS="$CFLAGS -O3"
+    CXXFLAGS="$CXXFLAGS -O3"
     fi
     fi
 
