@@ -29,7 +29,9 @@
 #include "data_manager.h"
 #include "matxin_string_utils.h"
 #include "transfer.h"
+#include "xml.h"
 #include "xmldoc.h"
+#include "xslt.h"
 #include "xsltstylesheet.h"
 
 using namespace std;
@@ -83,9 +85,15 @@ int main(int argc, char *argv[]) {
       }
 
       string rule = wstos(wregla);
-      matxin::xsltStylesheet style(rule.c_str(), rule.size(), "noname.xml",
-                                   NULL, 0);
-      cascade.push_back(style);
+      try {
+        matxin::xsltStylesheet style(rule.c_str(), rule.size(), "noname.xml",
+                                     NULL, 0);
+        cascade.push_back(style);
+      } catch (...) {
+        std::wcerr << L"Error loading rule " << line.id << L"\n"
+                   << wregla << std::endl;
+        throw;
+      }
     }
 
     matxin::xmlDoc doc(0, "/", NULL, 0);
@@ -95,15 +103,16 @@ int main(int argc, char *argv[]) {
     for (vector<matxin::xsltStylesheet>::const_iterator cascade_iterator =
              cascade.cbegin();
          cascade_iterator != cascade_end; ++cascade_iterator)
-      doc = matxin::xmlDoc(*cascade_iterator, doc, NULL);
+      try {
+        doc = matxin::xmlDoc(*cascade_iterator, doc, NULL);
+      } catch (...) {
+        std::wcerr << L"Error." << std::endl;
+        throw;
+      }
 
     xmlSubstituteEntitiesDefault(1);
     xmlSaveFormatFileEnc("-", doc, "UTF-8", 1);
   } catch (...) {
-    std::wcerr << "Terminating..." << std::endl;
-    xsltCleanupGlobals();
-    xmlCleanupParser();
     return EXIT_FAILURE;
   }
 }
-

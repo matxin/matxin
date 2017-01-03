@@ -1,6 +1,8 @@
 #include "xsltstylesheet.h"
 
+#include "xml.h"
 #include "xmldoc.h"
+#include "xslt.h"
 
 // xmlReadMemory
 #include <libxml/parser.h>
@@ -28,12 +30,19 @@
 namespace matxin {
 xsltStylesheet::xsltStylesheet(const char *buffer, int size, const char *URL,
                                const char *encoding, int options) {
+  XML::get();
+  XSLT::get();
   std::unique_ptr<::xmlDoc, std::function<void(const xmlDocPtr)>> doc(
       xmlReadMemory(buffer, size, URL, encoding, options),
-      [](const xmlDocPtr doc) { xmlFreeDoc(doc); });
-  style_ = std::shared_ptr<::xsltStylesheet>(
-      xsltParseStylesheetDoc(doc.get()),
-      [](const xsltStylesheetPtr style) { xsltFreeStylesheet(style); });
+      [](const xmlDocPtr doc) {
+        XML::get();
+        xmlFreeDoc(doc);
+      });
+  style_ = std::shared_ptr<::xsltStylesheet>(xsltParseStylesheetDoc(doc.get()),
+                                             [](const xsltStylesheetPtr style) {
+                                               XSLT::get();
+                                               xsltFreeStylesheet(style);
+                                             });
 
   if (style_.get() == NULL)
     throw std::runtime_error("");
