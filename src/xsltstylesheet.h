@@ -13,7 +13,10 @@ class xmlDoc;
 
 class xsltStylesheet {
 public:
-  xsltStylesheet(const xmlDoc &doc);
+  // xmlReadMemory
+  // xsltParseStylesheetDoc
+  xsltStylesheet(const char *buffer, int size, const char *URL,
+                 const char *encoding, int options);
 
 private:
   friend xmlDoc;
