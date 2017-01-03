@@ -91,39 +91,25 @@ int main(int argc, char *argv[])
     }
 
     string rule = wstos(wregla);
-    matxin::xmlDoc doc(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
-    matxin::xsltStylesheet style(doc);
-    cascade.push_back(style);
+    cascade.emplace_back(
+        matxin::xmlDoc(rule.c_str(), rule.size(), "noname.xml", NULL, 0));
     free(regla);
   }
 
-  matxin::xmlDoc doc(0, "/", NULL, 0);
+  matxin::xmlDoc res(0, "/", NULL, 0);
 
   {
-    const std::vector<matxin::xsltStylesheet>::const_iterator cascade_end = cascade.cend();
+    const std::vector<matxin::xsltStylesheet>::const_iterator cascade_end =
+        cascade.cend();
 
-    for (vector<matxin::xsltStylesheet>::const_iterator cascade_iterator = cascade.begin(); cascade_iterator != cascade_end; ++cascade_iterator)
-      doc = matxin::xmlDoc(*cascade_iterator, doc, NULL);
+    for (vector<matxin::xsltStylesheet>::const_iterator cascade_iterator =
+             cascade.begin();
+         cascade_iterator != cascade_end; ++cascade_iterator)
+      res = matxin::xmlDoc(*cascade_iterator, res, NULL);
   }
 
   xmlSubstituteEntitiesDefault(1);
-  xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
-
-//    buf = xmlBufferCreate();
-
-  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
-  {
-    xsltFreeStylesheet(*it);
-  } 
-
-/*
-  res = xsltApplyStylesheet(cur, doc, NULL);
-  xsltSaveResultToFile(stdout, res, cur);
-*/
-
-  xmlFreeDoc(doc);
-  xmlFreeDoc(res);
-
+  matxin::xmlSaveFormatFileEnc("-", res, "UTF-8", 1);
   xsltCleanupGlobals();
   xmlCleanupParser();
 }

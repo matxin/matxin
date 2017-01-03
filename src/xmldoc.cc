@@ -9,6 +9,7 @@
 // xmlDoc
 // xmlDocPtr
 // xmlFreeDoc
+// xmlSaveFormatFileEnc
 #include <libxml/tree.h>
 
 // xsltApplyStylesheet
@@ -36,5 +37,10 @@ xmlDoc::xmlDoc(const xsltStylesheet &style, const xmlDoc &doc,
            [](const xmlDocPtr doc) { xmlFreeDoc(doc); }) {
   if (doc_.get() == NULL)
     throw;
+}
+
+int xmlSaveFormatFileEnc(const char *filename, xmlDoc cur, const char *encoding,
+                         int format) {
+  ::xmlSaveFormatFileEnc(filename, cur.get_doc(), encoding, format);
 }
 }

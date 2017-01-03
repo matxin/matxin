@@ -8,8 +8,11 @@
 #include <memory>
 
 namespace matxin {
+class xmlDoc;
 class xsltStylesheet;
 
+int xmlSaveFormatFileEnc(const char *filename, xmlDoc cur, const char *encoding,
+                         int format);
 class xmlDoc {
 public:
   // xmlReadFd
@@ -24,6 +27,8 @@ public:
 
 private:
   friend xsltStylesheet;
+  friend int xmlSaveFormatFileEnc(const char *filename, xmlDoc cur,
+                                  const char *encoding, int format);
 
   const xmlDocPtr get_doc() const;
 
