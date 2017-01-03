@@ -22,9 +22,10 @@ public:
   ~xmlDoc();
 
   xmlDoc(const xmlDoc &doc) = delete;
-  xmlDoc(xmlDoc &&doc) = delete;
   xmlDoc &operator=(const xmlDoc &doc) = delete;
   xmlDoc &operator=(xmlDoc &&doc) = delete;
+
+  xmlDoc(xmlDoc &&doc) = default;
 
 private:
   friend xsltStylesheet;

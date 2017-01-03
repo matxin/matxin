@@ -14,9 +14,10 @@ public:
   ~xsltStylesheet();
 
   xsltStylesheet(const xsltStylesheet &style) = delete;
-  xsltStylesheet(xsltStylesheet &&style) = delete;
   xsltStylesheet &operator=(const xsltStylesheet &style) = delete;
   xsltStylesheet &operator=(xsltStylesheet &&style) = delete;
+
+  xsltStylesheet(xsltStylesheet &&style) = default;
 
 private:
   friend xmlDoc;

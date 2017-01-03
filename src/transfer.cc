@@ -97,19 +97,13 @@ int main(int argc, char *argv[])
     free(regla);
   }
 
-  xmlDocPtr doc, res = NULL;
-  doc = xmlReadFd(0, "/", NULL, 0);
+  matxin::xmlDoc doc(0, "/", NULL, 0);
 
-  res = doc; 
-  xsltStylesheetPtr last = NULL;
-  for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
-  { 
-    res = xsltApplyStylesheet(*it, res, NULL);
-    if(res == NULL)
-    {
-      wcerr << L"Error." << endl;
-      break;
-    }    
+  {
+    const std::vector<matxin::xsltStylesheet>::const_iterator cascade_end = cascade.cend();
+
+    for (vector<matxin::xsltStylesheet>::const_iterator cascade_iterator = cascade.begin(); cascade_iterator != cascade_end; ++cascade_iterator)
+      doc = matxin::xmlDoc(*cascade_iterator, doc, NULL);
   }
 
   xmlSubstituteEntitiesDefault(1);
