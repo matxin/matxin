@@ -31,6 +31,8 @@
 #include "data_manager.h"
 #include "matxin_string_utils.h"
 #include "transfer.h"
+#include "xmldoc.h"
+#include "xsltstylesheet.h"
 
 using namespace std;
 
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
 
   FILE *rin = fopen(argv[1], "rb");
 
-  vector<xsltStylesheetPtr> cascade; 
+  vector<matxin::xsltStylesheet> cascade; 
 
   while(!feof(rin))
   {
@@ -88,21 +90,10 @@ int main(int argc, char *argv[])
       wcerr << wregla << endl;
     }
 
-    xmlDocPtr doc = NULL;
     string rule = wstos(wregla);
-    doc = xmlReadMemory(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
-    xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
-    if(xsls != NULL) 
-    {
-      cascade.push_back(xsls);
-    }
-    else
-    {
-      wcerr << L"Error loading rule " << line.id << endl; 
-      wcerr << wregla << endl;
-      exit(-1);
-    }
-
+    matxin::xmlDoc doc(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
+    matxin::xsltStylesheet style(doc);
+    cascade.push_back(style);
     free(regla);
   }
 
