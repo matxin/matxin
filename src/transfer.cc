@@ -92,7 +92,6 @@ int main(int argc, char *argv[])
     string rule = wstos(wregla);
     doc = xmlReadMemory(rule.c_str(), rule.size(), "noname.xml", NULL, 0);
     xsltStylesheetPtr xsls = xsltParseStylesheetDoc(doc);
-    xmlFreeDoc(doc);
     if(xsls != NULL) 
     {
       cascade.push_back(xsls);
@@ -109,6 +108,7 @@ int main(int argc, char *argv[])
 
   xmlDocPtr doc = NULL;
   doc = xmlReadFd(0, "/", NULL, 0);
+  std::vector<xmlDocPtr> docs;
 
   for (vector<xsltStylesheetPtr>::iterator it = cascade.begin() ; it != cascade.end(); ++it)
   { 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
       break;
     }    
 
-    xmlFreeDoc(doc);
+    docs.push_back(doc);
     doc = res;
   }
 
@@ -139,6 +139,11 @@ int main(int argc, char *argv[])
 */
 
   xmlFreeDoc(doc);
+
+  for (std::vector<xmlDocPtr>::const_reverse_iterator it = docs.crbegin();
+       it != docs.crend(); ++it) {
+    xmlFreeDoc(*it);
+  }
 
   xsltCleanupGlobals();
   xmlCleanupParser();
