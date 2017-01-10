@@ -1,5 +1,8 @@
 #include "dependency_tree_node.h"
 
+// std::runtime_error
+#include <stdexcept>
+
 // std::stoul
 // std::wstring
 #include <string>
@@ -14,9 +17,8 @@ namespace matxin {
 DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
   auto fields(split(std::move(line), L'\t'));
 
-  if (fields.size() != 10) {
-    throw;
-  }
+  if (fields.size() != 10)
+    throw std::runtime_error("");
 }
 
 template <class StringType>
