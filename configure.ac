@@ -196,7 +196,7 @@ AC_LANG([C++])
 # This would be the right thing to use, were it to work.
 #AX_CXX_COMPILE_STDCXX_11
 
-CXXFLAGS="$CXXFLAGS -std=gnu++11"
+CXXFLAGS="$CXXFLAGS -std=gnu++1z"
 
 
 #
