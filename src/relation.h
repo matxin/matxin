@@ -8,6 +8,9 @@ namespace matxin {
 class Relation {
 public:
   Relation(std::wstring &&deprel);
+
+private:
+  std::wstring deprel_;
 };
 }
 
