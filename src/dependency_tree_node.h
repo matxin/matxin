@@ -16,11 +16,13 @@
 namespace matxin {
 class DependencyTreeNode {
 public:
-  DependencyTreeNode(std::wstring &&line);
-
   template <class StringType>
   static std::vector<StringType> &&
   split(StringType &&string_, typename StringType::value_type delimiter);
+
+  DependencyTreeNode(std::wstring &&line);
+
+  long get_id() { return id_; }
 
 private:
   long id_;

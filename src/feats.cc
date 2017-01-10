@@ -1,5 +1,6 @@
-#include "dependency_tree_node.h"
 #include "feats.h"
+
+#include "dependency_tree_node.h"
 
 // std::runtime_error
 #include <stdexcept>

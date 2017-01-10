@@ -4,13 +4,21 @@
 // std::wistream
 #include <istream>
 
+// std::map
+#include <map>
+
 // std::vector
 #include <vector>
 
 namespace matxin {
+class DependencyTreeNode;
+
 class DependencyTree {
 public:
   DependencyTree(std::wistream &conll_u);
+
+private:
+  std::map<long, DependencyTreeNode> nodes_;
 };
 }
 

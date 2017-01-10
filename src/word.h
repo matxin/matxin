@@ -1,11 +1,11 @@
 #ifndef WORD_H
 #define WORD_H
 
-// std::wstring
-#include <string>
-
 #include "feats.h"
 #include "upostag.h"
+
+// std::wstring
+#include <string>
 
 namespace matxin {
 class Word {
