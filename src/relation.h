@@ -7,6 +7,7 @@
 namespace matxin {
 class Relation {
 public:
+  Relation() = default;
   Relation(std::wstring &&deprel);
 
 private:

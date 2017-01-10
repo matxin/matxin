@@ -14,6 +14,8 @@
 #include "word.h"
 
 namespace matxin {
+class DependencyTree;
+
 class DependencyTreeNode {
 public:
   template <class StringType>
@@ -24,12 +26,15 @@ public:
 
   long get_id() { return id_; }
 
+  void link(DependencyTree &tree);
+
 private:
   long id_;
   std::experimental::optional<std::wstring> form_;
   Word word_;
   long head_;
   Relation deprel_;
+  std::vector<DependencyTreeNode*> dependents_;
 };
 }
 

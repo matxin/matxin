@@ -1,5 +1,7 @@
 #include "dependency_tree_node.h"
 
+#include "dependency_tree.h"
+
 // std::runtime_error
 #include <stdexcept>
 
@@ -18,21 +20,6 @@
 #include "upostag.h"
 
 namespace matxin {
-DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
-  auto fields(split(std::move(line), L'\t'));
-
-  if (fields.size() != 10)
-    throw std::runtime_error("");
-
-  id_ = std::stoul(fields[0]);
-  form_ = std::move(fields[1]);
-  word_ = std::move(Word(std::move(fields[2]),
-                         std::move(Upostag(std::move(fields[3]))),
-                         std::move(Feats(std::move(fields[5])))));
-  head_ = std::stoul(fields[6]);
-  deprel_ = std::move(Relation(std::move(fields[7])));
-}
-
 template <class StringType>
 std::vector<StringType> &&
 DependencyTreeNode::split(StringType &&string_,
@@ -50,5 +37,24 @@ DependencyTreeNode::split(StringType &&string_,
 
     delimiter_search_start = delimiter_index + 1;
   }
+}
+
+DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
+  auto fields(split(std::move(line), L'\t'));
+
+  if (fields.size() != 10)
+    throw std::runtime_error("");
+
+  id_ = std::stoul(fields[0]);
+  form_ = std::move(fields[1]);
+  word_ = std::move(Word(std::move(fields[2]),
+                         std::move(Upostag(std::move(fields[3]))),
+                         std::move(Feats(std::move(fields[5])))));
+  head_ = std::stoul(fields[6]);
+  deprel_ = std::move(Relation(std::move(fields[7])));
+}
+
+void DependencyTreeNode::link(DependencyTree &tree) {
+  tree.get_nodes().at(id_)->dependents_.push_back(this);
 }
 }

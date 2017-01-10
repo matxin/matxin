@@ -17,8 +17,11 @@ class DependencyTree {
 public:
   DependencyTree(std::wistream &conll_u);
 
-private:
-  std::map<long, DependencyTreeNode> nodes_;
+protected:
+  friend DependencyTreeNode;
+  std::map<long, DependencyTreeNode*> nodes_;
+
+  decltype(nodes_) get_nodes() { return nodes_; }
 };
 }
 
