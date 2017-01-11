@@ -191,6 +191,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AM_PROG_AR
 AC_LANG([C++])
 
 # This would be the right thing to use, were it to work.
@@ -352,7 +353,8 @@ AC_CHECK_FUNCS([socket])
 #
 AC_CONFIG_FILES([matxin.pc
                  Makefile
-                 src/Makefile])
+                 src/Makefile
+                 src/test/Makefile])
 AC_OUTPUT
 
 #
