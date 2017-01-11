@@ -15,13 +15,16 @@ class DependencyTreeNode;
 
 class DependencyTree {
 public:
-  DependencyTree(std::wistream &conll_u);
+  DependencyTree(std::wstring &&line, std::wistream &conll_u);
 
 protected:
   friend DependencyTreeNode;
   std::map<long, DependencyTreeNode*> nodes_;
 
   decltype(nodes_) get_nodes() { return nodes_; }
+
+private:
+  void get_not_empty_line(std::wstring &line, std::wistream &conll_u);
 };
 }
 

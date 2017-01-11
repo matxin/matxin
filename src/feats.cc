@@ -16,9 +16,9 @@ Feats::Feats(std::wstring &&feats) {
   auto items(DependencyTreeNode::split(std::move(feats), L'|'));
 
   {
-    decltype(items)::iterator items_end = items.end();
+    decltype(items)::iterator items_end(std::move(items.end()));
 
-    for (decltype(items)::iterator items_iterator = items.begin();
+    for (decltype(items)::iterator items_iterator(std::move(items.begin()));
          items_iterator != items_end; ++items_iterator) {
       auto item(DependencyTreeNode::split(std::move(*items_iterator), L'='));
 

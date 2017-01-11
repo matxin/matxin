@@ -26,7 +26,7 @@ public:
 
   long get_id() { return id_; }
 
-  void link(DependencyTree &tree);
+  void link(DependencyTree *const tree);
 
 private:
   long id_;
@@ -34,6 +34,9 @@ private:
   Word word_;
   long head_;
   Relation deprel_;
+
+  // Invariate: once linking begins, the dependency tree itself does not
+  // change. Otherwise, these pointers would be invalidated.
   std::vector<DependencyTreeNode*> dependents_;
 };
 }

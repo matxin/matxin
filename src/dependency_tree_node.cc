@@ -54,7 +54,7 @@ DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
   deprel_ = std::move(Relation(std::move(fields[7])));
 }
 
-void DependencyTreeNode::link(DependencyTree &tree) {
-  tree.get_nodes().at(id_)->dependents_.push_back(this);
+void DependencyTreeNode::link(DependencyTree *const tree) {
+  tree->get_nodes().at(id_)->dependents_.push_back(this);
 }
 }
