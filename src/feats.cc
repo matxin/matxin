@@ -10,7 +10,7 @@
 
 namespace matxin {
 Feats::Feats(std::wstring &&feats) {
-  if (feats == UNDERSCORE)
+  if (feats == L"_")
     return;
 
   auto items(DependencyTreeNode::split(std::move(feats), L'|'));
@@ -29,6 +29,4 @@ Feats::Feats(std::wstring &&feats) {
     }
   }
 }
-
-const std::wstring Feats::UNDERSCORE = L"_";
 }

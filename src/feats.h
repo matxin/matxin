@@ -14,7 +14,6 @@ public:
   Feats(std::wstring &&feats);
 
 private:
-  static const std::wstring UNDERSCORE;
   std::map<std::wstring, std::wstring> feats_;
 };
 }
