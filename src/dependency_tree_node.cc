@@ -30,7 +30,7 @@ DependencyTreeNode::split(StringType &&string_,
     typename StringType::size_type delimiter_index =
         string_.find_first_of(delimiter, delimiter_search_start);
     string_vector.push_back(
-        std::move(string_.substring(delimiter_search_start, delimiter_index)));
+        std::move(string_.substr(delimiter_search_start, delimiter_index)));
 
     if (delimiter_index == StringType::npos)
       return std::move(string_vector);
@@ -55,6 +55,6 @@ DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
 }
 
 void DependencyTreeNode::link(DependencyTree *const tree) {
-  tree->get_nodes().at(id_)->dependents_.push_back(this);
+  tree->get_nodes().at(id_).dependents_.push_back(this);
 }
 }

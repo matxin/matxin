@@ -19,7 +19,7 @@ public:
 
 protected:
   friend DependencyTreeNode;
-  std::map<long, DependencyTreeNode*> nodes_;
+  std::map<long, DependencyTreeNode> nodes_;
 
   decltype(nodes_) get_nodes() { return nodes_; }
 

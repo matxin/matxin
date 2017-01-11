@@ -37,7 +37,7 @@ DependencyTree::DependencyTree(std::wstring &&line, std::wistream &conll_u) {
         for (decltype(nodes_)::iterator nodes_iterator(
                 std::move(nodes_.begin()));
             nodes_iterator != nodes_end; ++nodes_iterator)
-          nodes_iterator->second->link(this);
+          nodes_iterator->second.link(this);
       }
 
       return;
