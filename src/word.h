@@ -11,7 +11,7 @@ namespace matxin {
 class Word {
 public:
   Word() = default;
-  Word(std::wstring &&lemma, Upostag &&Upostag, Feats &&feats);
+  Word(std::wstring &&lemma, Upostag &&upostag, Feats &&feats);
 
 private:
   std::wstring lemma_;
