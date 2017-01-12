@@ -121,4 +121,4 @@ matxin-validate-modes: Makefile.am validate-header.sh
 	@chmod a+x $@
 
 lib_LIBRARIES = libdtree.a
-libdtree_a_SOURCES = dependency_tree.cc dependency_tree_node.cc word.cc upostag.cc feats.cc relation.cc
+libdtree_a_SOURCES = dependency_tree.cc dependency_tree_node.cc word.cc upostag.cc feats.cc relation.cc matxin_string_utils.cc

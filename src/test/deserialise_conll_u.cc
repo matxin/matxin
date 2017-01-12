@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
       return EXIT_FAILURE;
     }
 
-    matxin::DependencyTree dependency_tree(std::move(line), std::wcin);
+    matxin::DependencyTree dependency_tree(line, std::wcin);
   } catch (const std::exception &exception_) {
     std::cerr << argv[0] << ": " << exception_.what() << "\n";
     return EXIT_FAILURE;

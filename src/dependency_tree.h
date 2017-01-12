@@ -17,7 +17,7 @@ class DependencyTreeNode;
 
 class DependencyTree {
 public:
-  DependencyTree(std::wstring &&line, std::wistream &conll_u);
+  DependencyTree(std::wstring &line, std::wistream &conll_u);
 
 protected:
   friend DependencyTreeNode;

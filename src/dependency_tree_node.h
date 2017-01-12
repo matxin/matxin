@@ -19,10 +19,10 @@ class DependencyTree;
 class DependencyTreeNode {
 public:
   template <class StringType>
-  static std::vector<StringType> &&
-  split(StringType &&string_, typename StringType::value_type delimiter);
+  static std::vector<StringType>
+  split(const StringType &string_, typename StringType::value_type delimiter);
 
-  DependencyTreeNode(std::wstring &&line);
+  DependencyTreeNode(const std::wstring &line);
 
   long get_id() { return id_; }
 
@@ -37,7 +37,7 @@ private:
 
   // Invariate: once linking begins, the dependency tree itself does not
   // change. Otherwise, these pointers would be invalidated.
-  std::vector<DependencyTreeNode*> dependents_;
+  std::vector<DependencyTreeNode *> dependents_;
 };
 }
 

@@ -19,28 +19,40 @@
 #include "relation.h"
 #include "upostag.h"
 
+// DEBUG
+#include "matxin_string_utils.h"
+#include <iostream>
+
 namespace matxin {
 template <class StringType>
-std::vector<StringType> &&
-DependencyTreeNode::split(StringType &&string_,
+std::vector<StringType>
+DependencyTreeNode::split(const StringType &string_,
                           typename StringType::value_type delimiter) {
+  std::cerr << "splitting `" << wstos(string_) << "' on `"
+            << wstos(StringType(1, delimiter)) << "'\n";
   std::vector<StringType> string_vector;
 
   for (typename StringType::size_type delimiter_search_start = 0;;) {
     typename StringType::size_type delimiter_index =
         string_.find_first_of(delimiter, delimiter_search_start);
-    string_vector.push_back(
-        std::move(string_.substr(delimiter_search_start, delimiter_index)));
+    std::cerr << "matched `" << wstos(StringType(1, delimiter)) << "' at index "
+              << delimiter_index << "\n";
+    std::cerr << "split `"
+              << wstos(string_.substr(delimiter_search_start,
+                                      delimiter_index - delimiter_search_start))
+              << "'\n";
+    string_vector.emplace_back(string_.substr(
+        delimiter_search_start, delimiter_index - delimiter_search_start));
 
     if (delimiter_index == StringType::npos)
-      return std::move(string_vector);
+      return string_vector;
 
     delimiter_search_start = delimiter_index + 1;
   }
 }
 
-DependencyTreeNode::DependencyTreeNode(std::wstring &&line) {
-  auto fields(split(std::move(line), L'\t'));
+DependencyTreeNode::DependencyTreeNode(const std::wstring &line) {
+  auto fields(split(line, L'\t'));
 
   if (fields.size() != 10)
     throw std::runtime_error("");

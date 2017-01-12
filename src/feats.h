@@ -11,7 +11,7 @@ namespace matxin {
 class Feats {
 public:
   Feats() = default;
-  Feats(std::wstring &&feats);
+  Feats(const std::wstring &feats);
 
 private:
   std::map<std::wstring, std::wstring> feats_;
