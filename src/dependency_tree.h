@@ -21,15 +21,11 @@ public:
 
 protected:
   friend DependencyTreeNode;
+  DependencyTreeNode *root_;
   std::map<long, DependencyTreeNode> nodes_;
 
-  const decltype(nodes_) &get_nodes() const { return nodes_; }
-  decltype(nodes_) &get_nodes() {
-    return const_cast<decltype(nodes_) &>(
-        static_cast<const decltype(this)>(this)->get_nodes());
-  }
-
 private:
+  void emplace_node(const std::wstring &line);
   void get_not_empty_line(std::wstring &line, std::wistream &conll_u);
 };
 }

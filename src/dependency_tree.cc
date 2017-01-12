@@ -11,19 +11,17 @@
 // std::wstring
 #include <string>
 
+// DEBUG
+#include <iostream>
+#include "matxin_string_utils.h"
+
 namespace matxin {
 DependencyTree::DependencyTree(std::wstring &line, std::wistream &conll_u) {
   // Ignore ``Comment lines starting with hash (#)''. A comment line is
   // expected only directly after an empty line and directly before a word
   // line.
-  if (line[0] != L'#') {
-    try {
-      DependencyTreeNode node(line);
-      nodes_.emplace(node.get_id(), std::move(node));
-    } catch (const std::runtime_error &exception) {
-      throw;
-    }
-  }
+  if (line[0] != L'#')
+    emplace_node(line);
 
   get_not_empty_line(line, conll_u);
 
@@ -35,14 +33,26 @@ DependencyTree::DependencyTree(std::wstring &line, std::wistream &conll_u) {
         decltype(nodes_)::iterator nodes_end(nodes_.end());
 
         for (decltype(nodes_)::iterator nodes_iterator(nodes_.begin());
-             nodes_iterator != nodes_end; ++nodes_iterator)
+             nodes_iterator != nodes_end; ++nodes_iterator) {
+          std::cerr << "linking\n";
           nodes_iterator->second.link(this);
+        }
       }
 
       return;
     }
 
+    emplace_node(line);
     get_not_empty_line(line, conll_u);
+  }
+}
+
+void DependencyTree::emplace_node(const std::wstring &line) {
+  try {
+    DependencyTreeNode node(line);
+    nodes_.emplace(node.get_id(), node);
+  } catch (const std::runtime_error &exception) {
+    throw;
   }
 }
 
@@ -63,5 +73,7 @@ void DependencyTree::get_not_empty_line(std::wstring &line,
   // An empty line would have been handled earlier.
   if (!conll_u)
     throw std::runtime_error("Unexpected end-of-file before word line");
+
+  std::cerr << "got line `" << wstos(line) << "'\n";
 }
 }

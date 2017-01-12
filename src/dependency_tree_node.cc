@@ -67,6 +67,11 @@ DependencyTreeNode::DependencyTreeNode(const std::wstring &line) {
 }
 
 void DependencyTreeNode::link(DependencyTree *const tree) {
-  tree->get_nodes().at(id_).dependents_.push_back(this);
+  if (head_ == 0) {
+    tree->root_ = this;
+    return;
+  }
+
+  tree->nodes_.at(head_).dependents_.push_back(this);
 }
 }
