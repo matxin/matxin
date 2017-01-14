@@ -1,4 +1,4 @@
-EXTRA_DIST = data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml xml.h xmldoc.h xslt.h xsltstylesheet.h dependency_tree.h dependency_tree_node.h word.h upostag.h feats.h relation.h
+EXTRA_DIST = data_manager.h matxin_string_utils.h simpleregex.h string_utils.h utf_converter.h xml_reader.h gen_fst2regex.sh gen_matxin_translator.sh deformat.xsl txt-format.xml wiki-format.xml rtf-format.xml html-format.xml xml.h xmldoc.h xslt.h xsltstylesheet.h
 
 matxin_DATA = modes.rng modes2bash.xsl matxin-createmodes.awk
 
@@ -47,8 +47,8 @@ matxin_reformat_LDADD = -lfoma
 matxin_generate_SOURCES = generate.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
 matxin_generate_LDADD =  -lfoma  
 
-matxin_linearise_SOURCES = linearise.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h #io_redirect_handler.cc io_redirect_handler.h
-matxin_linearise_LDADD =  -lfoma libdtree.a
+matxin_linearise_SOURCES = linearise.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h  #io_redirect_handler.cc io_redirect_handler.h
+matxin_linearise_LDADD =  -lfoma  
 
 matxin_transfer_SOURCES = transfer.cc utf_converter.cc data_manager.cc string_utils.cc xml_reader.cc simpleregex.cc matxin_string_utils.cc matxin_string_utils.h xml.cc xmldoc.cc xslt.cc xsltstylesheet.cc  #io_redirect_handler.cc io_redirect_handler.h
 matxin_transfer_LDADD =  -lfoma  
@@ -120,5 +120,3 @@ matxin-validate-modes: Makefile.am validate-header.sh
 	@echo "$(XMLLINT) --relaxng $(matxindir)/modes.rng --noout \"\$$FILE1\"" >>$@
 	@chmod a+x $@
 
-lib_LIBRARIES = libdtree.a
-libdtree_a_SOURCES = dependency_tree.cc dependency_tree_node.cc word.cc upostag.cc feats.cc relation.cc matxin_string_utils.cc

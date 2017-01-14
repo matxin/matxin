@@ -191,13 +191,12 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
-AM_PROG_AR
 AC_LANG([C++])
 
 # This would be the right thing to use, were it to work.
 #AX_CXX_COMPILE_STDCXX_11
 
-CXXFLAGS="$CXXFLAGS -std=gnu++1z"
+CXXFLAGS="$CXXFLAGS -std=gnu++11"
 
 
 #
@@ -353,8 +352,7 @@ AC_CHECK_FUNCS([socket])
 #
 AC_CONFIG_FILES([matxin.pc
                  Makefile
-                 src/Makefile
-                 src/test/Makefile])
+                 src/Makefile])
 AC_OUTPUT
 
 #

@@ -46,5 +46,3 @@ Makefile.in
 /src/txt-deformat.cc
 /src/wiki-deformat.cc
 /stamp-h1
-*.a
-/src/test/deserialise-conll-u
