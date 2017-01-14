@@ -23,7 +23,7 @@ private:
 
   const xsltStylesheetPtr get_style() const;
 
-  std::shared_ptr<::xsltStylesheet> style_;
+  std::shared_ptr< ::xsltStylesheet> style_;
 };
 }
 
