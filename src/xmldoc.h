@@ -28,7 +28,7 @@ private:
 
   const xmlDocPtr get_doc() const;
 
-  std::shared_ptr<::xmlDoc> doc_;
+  std::shared_ptr< ::xmlDoc> doc_;
 };
 }
 
