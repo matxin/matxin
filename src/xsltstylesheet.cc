@@ -32,13 +32,13 @@ xsltStylesheet::xsltStylesheet(const char *buffer, int size, const char *URL,
                                const char *encoding, int options) {
   XML::get();
   XSLT::get();
-  std::unique_ptr<::xmlDoc, std::function<void(const xmlDocPtr)>> doc(
+  std::unique_ptr< ::xmlDoc, std::function<void(const xmlDocPtr)>> doc(
       xmlReadMemory(buffer, size, URL, encoding, options),
       [](const xmlDocPtr doc) {
         XML::get();
         xmlFreeDoc(doc);
       });
-  style_ = std::shared_ptr<::xsltStylesheet>(xsltParseStylesheetDoc(doc.get()),
+  style_ = std::shared_ptr< ::xsltStylesheet>(xsltParseStylesheetDoc(doc.get()),
                                              [](const xsltStylesheetPtr style) {
                                                XSLT::get();
                                                xsltFreeStylesheet(style);
